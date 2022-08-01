@@ -10,14 +10,14 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:code-assistant.extract"
+    "onCommand:code-assistant.extract.toCurrentModule"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "code-assistant.helloWorld",
-        "title": "Hello World"
+        "command": "code-assistant.extract.toCurrentModule",
+        "title": "Extract To Current Module"
       }
     ]
   },
