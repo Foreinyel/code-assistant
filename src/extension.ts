@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as extract from "./extract";
+import { runCommand } from "./common";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -17,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   let disposable = vscode.commands.registerCommand(
     "code-assistant.extract.toCurrentModule",
-    extract.toCurrentModule
+    runCommand(extract.toCurrentModule)
   );
 
   context.subscriptions.push(disposable);
