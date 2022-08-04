@@ -37,4 +37,8 @@ export const toCurrentModule = () => {
     selection.start,
     selection.end
   );
+
+  const sourceFile = programFile.ast;
+  const lineStart = selection.start.line;
+  const lineEnd = selection.end.line;
 };
