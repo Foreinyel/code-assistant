@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { loadNodeListByFile, ProgramFile } from "@fe-doctor/core";
 import { strict as assert } from "assert";
 import * as path from "path";
+import * as ts from "typescript";
 
 export const toCurrentModule = () => {
   const editor = vscode.window.activeTextEditor;
@@ -28,5 +29,12 @@ export const toCurrentModule = () => {
   console.log(
     `🚀 ~ file: to-current-module.ts ~ line 28 ~ toCurrentModule ~ nodeList`,
     nodeList
+  );
+  const [selection] = selections;
+  console.log(
+    `🚀 ~ file: to-current-module.ts ~ line 33 ~ toCurrentModule ~ selection`,
+    selection,
+    selection.start,
+    selection.end
   );
 };
