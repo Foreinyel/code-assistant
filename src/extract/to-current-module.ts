@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { loadNodeListByFile, ProgramFile } from "@fe-doctor/core";
+import { loadNodeListByFile, ProgramFile, getNodeText } from "@fe-doctor/core";
 import { strict as assert } from "assert";
 import * as path from "path";
 import * as ts from "typescript";
@@ -26,19 +26,20 @@ export const toCurrentModule = () => {
   );
 
   const nodeList = loadNodeListByFile(programFile);
-  console.log(
-    `🚀 ~ file: to-current-module.ts ~ line 28 ~ toCurrentModule ~ nodeList`,
-    nodeList
-  );
   const [selection] = selections;
-  console.log(
-    `🚀 ~ file: to-current-module.ts ~ line 33 ~ toCurrentModule ~ selection`,
-    selection,
-    selection.start,
-    selection.end
-  );
 
   const sourceFile = programFile.ast;
   const lineStart = selection.start.line;
   const lineEnd = selection.end.line;
+  const selectedText = document.getText(
+    new vscode.Range(
+      new vscode.Position(selection.start.line, 0),
+      new vscode.Position(selection.end.line + 1, 0)
+    )
+  );
+  // todo: validate if it's right code block
+
+  // for (let node of nodeList) {
+
+  // }
 };
