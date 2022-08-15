@@ -39,7 +39,7 @@ export const toCurrentModule = () => {
   );
   // todo: validate if it's right code block
 
-  // for (let node of nodeList) {
+  for (let node of nodeList) {
 
-  // }
+  }
 };
