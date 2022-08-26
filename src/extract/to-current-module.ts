@@ -4,7 +4,9 @@ import { strict as assert } from "assert";
 import * as path from "path";
 import * as ts from "typescript";
 
-export const toCurrentModule = () => {
+const factory = ts.factory;
+
+export const toCurrentModule = async () => {
   const editor = vscode.window.activeTextEditor;
   const workspace = vscode.workspace;
   assert.ok(workspace.workspaceFolders?.length === 1, "invalid workspace");
@@ -44,6 +46,7 @@ export const toCurrentModule = () => {
   // todo: validate if it's right code block, extracted code must be in one big block
 
   const selectedNodeList = new doctor.NodeList();
+  const selectedStatements: doctor.Node[] = [];
   const allIdentifiersInSelectedNodes: doctor.Node[] = [];
   const nodeIdsInSelectedNodes: Set<number> = new Set();
   const allIdentifers: doctor.Node[] = [];
@@ -65,6 +68,12 @@ export const toCurrentModule = () => {
     }
   }
 
+  for (let node of selectedNodeList) {
+    if (node?.parentId && !nodeIdsInSelectedNodes.has(node?.parentId)) {
+      selectedStatements.push(node);
+    }
+  }
+
   const identifiersReferenceFromOuterScope: doctor.Node[] = [];
   for (let identifier of allIdentifiersInSelectedNodes) {
     const relation = relations.findById(identifier.id);
@@ -73,10 +82,6 @@ export const toCurrentModule = () => {
     }
     if (!nodeIdsInSelectedNodes.has(relation.sourceNodeId)) {
       identifiersReferenceFromOuterScope.push(identifier);
-      console.log(
-        "identifiersReferenceFromOuterScope:",
-        doctor.getNodeText(identifier)
-      );
     }
   }
 
@@ -90,10 +95,134 @@ export const toCurrentModule = () => {
       nodeIdsInSelectedNodes.has(relation.sourceNodeId)
     ) {
       identifierReferedByOuterScope.push(identifier);
-      console.log(
-        "identifierReferedByOuterScope:",
-        doctor.getNodeText(identifier)
+    }
+  }
+
+  const newFunctionName = (await vscode.window.showInputBox({
+    title: "test",
+    prompt: "please input new function name",
+    validateInput: (value) => {
+      if (!value) {
+        return "new function name required.";
+      }
+      return undefined;
+    },
+  })) as string;
+  // 创建一个函数
+  const newFunction = factory.createVariableStatement(
+    undefined,
+    factory.createVariableDeclarationList(
+      [
+        factory.createVariableDeclaration(
+          factory.createIdentifier(newFunctionName),
+          undefined,
+          undefined,
+          factory.createArrowFunction(
+            undefined,
+            undefined,
+            [
+              factory.createParameterDeclaration(
+                undefined,
+                undefined,
+                undefined,
+                factory.createObjectBindingPattern(
+                  identifiersReferenceFromOuterScope.map((item) => {
+                    return factory.createBindingElement(
+                      undefined,
+                      undefined,
+                      item.sourceNode as ts.Identifier,
+                      undefined
+                    );
+                  })
+                ),
+                undefined,
+                undefined,
+                undefined
+              ),
+            ],
+            undefined,
+            factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+            factory.createBlock([
+              ...selectedStatements.map(
+                (item) => item.sourceNode as ts.Statement
+              ),
+              factory.createReturnStatement(
+                factory.createObjectLiteralExpression(
+                  identifierReferedByOuterScope.map((item) =>
+                    factory.createShorthandPropertyAssignment(
+                      item.sourceNode as ts.Identifier,
+                      undefined
+                    )
+                  ),
+                  false
+                )
+              ),
+            ])
+          )
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+  // 将新函数写入文件末尾
+  (sourceFile as any).statements = sourceFile?.statements.concat([newFunction]);
+
+  // 用新函数代替选择的函数体
+  const parentBlockOfSelectedNodes = nodeList.findById(
+    selectedStatements[0].parentId
+  );
+
+  const newStatements = [];
+  let insert = false;
+  const originSelectedStatements = selectedStatements.map(
+    (item) => item.sourceNode
+  );
+  for (let statement of (parentBlockOfSelectedNodes!.sourceNode as any)
+    .statements) {
+    if (!originSelectedStatements.includes(statement)) {
+      newStatements.push(statement);
+    } else if (!insert) {
+      insert = true;
+      newStatements.push(
+        factory.createVariableDeclarationList(
+          [
+            factory.createVariableDeclaration(
+              factory.createObjectBindingPattern(
+                identifierReferedByOuterScope.map((item) =>
+                  factory.createBindingElement(
+                    undefined,
+                    undefined,
+                    item.sourceNode as ts.Identifier,
+                    undefined
+                  )
+                )
+              ),
+              undefined,
+              undefined,
+              factory.createCallExpression(
+                factory.createIdentifier(newFunctionName),
+                undefined,
+                [
+                  factory.createObjectLiteralExpression(
+                    identifiersReferenceFromOuterScope.map((item) =>
+                      factory.createShorthandPropertyAssignment(
+                        item.sourceNode as ts.Identifier,
+                        undefined
+                      )
+                    ),
+                    false
+                  ),
+                ]
+              )
+            ),
+          ],
+          ts.NodeFlags.Const
+        )
       );
     }
   }
+
+  (parentBlockOfSelectedNodes!.sourceNode as any).statements = newStatements;
+
+  doctor.writeAstToFile(sourceFile!, fullFilename);
 };
