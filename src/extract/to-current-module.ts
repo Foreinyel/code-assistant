@@ -30,8 +30,6 @@ export const toCurrentModule = async () => {
 
   doctor.initNodeList(nodeList, [programFile]);
 
-  const relations = doctor.loadRelations(nodeList);
-
   const [selection] = selections;
 
   const sourceFile = programFile.ast;
@@ -45,11 +43,7 @@ export const toCurrentModule = async () => {
   );
   // todo: validate if it's right code block, extracted code must be in one big block
 
-  const selectedNodeList = new doctor.NodeList();
-  const selectedStatements: doctor.Node[] = [];
-  const allIdentifiersInSelectedNodes: doctor.Node[] = [];
   const nodeIdsInSelectedNodes: Set<number> = new Set();
-  const allIdentifers: doctor.Node[] = [];
   for (let node of nodeList) {
     if (
       typeof node?.line?.start === "number" &&
@@ -57,46 +51,18 @@ export const toCurrentModule = async () => {
       node?.line?.start >= lineStart &&
       node?.line?.end <= lineEnd
     ) {
-      selectedNodeList.add(node);
       nodeIdsInSelectedNodes.add(node.id);
-      if (node.kind === ts.SyntaxKind.Identifier) {
-        allIdentifiersInSelectedNodes.push(node);
-      }
-    }
-    if (node?.kind === ts.SyntaxKind.Identifier) {
-      allIdentifers.push(node);
     }
   }
 
-  for (let node of selectedNodeList) {
-    if (node?.parentId && !nodeIdsInSelectedNodes.has(node?.parentId)) {
-      selectedStatements.push(node);
-    }
-  }
-
-  const identifiersReferenceFromOuterScope: doctor.Node[] = [];
-  for (let identifier of allIdentifiersInSelectedNodes) {
-    const relation = relations.findById(identifier.id);
-    if (!relation) {
-      throw new Error(`Can't find source of ${doctor.getNodeText(identifier)}`);
-    }
-    if (!nodeIdsInSelectedNodes.has(relation.sourceNodeId)) {
-      identifiersReferenceFromOuterScope.push(identifier);
-    }
-  }
-
-  const identifierReferedByOuterScope: doctor.Node[] = [];
-  for (let identifier of allIdentifers) {
-    const relation = relations.findById(identifier.id);
-
-    if (
-      relation?.id &&
-      !nodeIdsInSelectedNodes.has(identifier.id) &&
-      nodeIdsInSelectedNodes.has(relation.sourceNodeId)
-    ) {
-      identifierReferedByOuterScope.push(identifier);
-    }
-  }
+  const {
+    selectedStatements,
+    identifierReferedByOuterScope,
+    identifiersReferenceFromOuterScope,
+  } = doctor.findReferredIdentifiersOfNodeList(
+    nodeList,
+    nodeIdsInSelectedNodes
+  );
 
   const newFunctionName = (await vscode.window.showInputBox({
     title: "test",

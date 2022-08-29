@@ -43,6 +43,6 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@fe-doctor/core": "0.0.45"
+    "@fe-doctor/core": "0.0.46"
   }
 }
