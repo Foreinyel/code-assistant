@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "code-assistant",
+  "version": "0.0.1",
+  "name": "Code Assistant",
+  "publisher": "Foreinyel",
+  "description": "Code Assistant helps you to code faster, refactor codes.",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "categories": ["Azure Boards"]
+}
