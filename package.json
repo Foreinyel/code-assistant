@@ -1,6 +1,6 @@
 {
-  "name": "code-assistant",
-  "displayName": "code-assistant",
+  "name": "jvs-code-assistant",
+  "displayName": "jvs-code-assistant",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -10,13 +10,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:code-assistant.extract.toCurrentModule"
+    "onCommand:jvs-code-assistant.extract.toCurrentModule"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "code-assistant.extract.toCurrentModule",
+        "command": "jvs-code-assistant.extract.toCurrentModule",
         "title": "Extract To Current Module"
       }
     ]
@@ -42,8 +42,8 @@
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@fe-doctor/core": "0.0.47",
+    "@fe-doctor/core": "0.0.48",
     "typescript": "^4.7.4"
   },
-  "author": "Foreinyel"
+  "publisher": "Foreinyel"
 }
