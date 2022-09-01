@@ -10,7 +10,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:jvs-code-assistant.extract.toCurrentModule"
+    "onCommand:jvs-code-assistant.extract.toCurrentModule",
+    "onCommand:jvs-code-assistant.extract.toTargetModule"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -18,6 +19,10 @@
       {
         "command": "jvs-code-assistant.extract.toCurrentModule",
         "title": "Extract To Current Module"
+      },
+      {
+        "command": "jvs-code-assistant.extract.toTargetModule",
+        "title": "Extract To Target Module"
       }
     ]
   },
@@ -44,6 +49,7 @@
   },
   "dependencies": {
     "@fe-doctor/core": "0.0.48",
+    "@hemyn/utils-node": "^0.3.2",
     "typescript": "^4.7.4"
   },
   "publisher": "Foreinyel"
