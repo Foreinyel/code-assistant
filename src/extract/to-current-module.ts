@@ -13,6 +13,7 @@ export const toCurrentModule = async () => {
     selectedStatements,
     identifierReferedByOuterScope,
     identifiersReferenceFromOuterScope,
+    thisFlag,
   } = doctor.findReferredIdentifiersOfNodeList(
     nodeList,
     nodeIdsInSelectedNodes
@@ -46,14 +47,31 @@ export const toCurrentModule = async () => {
                 undefined,
                 undefined,
                 factory.createObjectBindingPattern(
-                  identifiersReferenceFromOuterScope.map((item) => {
-                    return factory.createBindingElement(
-                      undefined,
-                      undefined,
-                      item.sourceNode as ts.Identifier,
-                      undefined
-                    );
-                  })
+                  thisFlag
+                    ? [
+                        factory.createBindingElement(
+                          undefined,
+                          undefined,
+                          factory.createIdentifier(doctor.constants.THIS),
+                          undefined
+                        ),
+                        ...identifiersReferenceFromOuterScope.map((item) => {
+                          return factory.createBindingElement(
+                            undefined,
+                            undefined,
+                            item.sourceNode as ts.Identifier,
+                            undefined
+                          );
+                        }),
+                      ]
+                    : identifiersReferenceFromOuterScope.map((item) => {
+                        return factory.createBindingElement(
+                          undefined,
+                          undefined,
+                          item.sourceNode as ts.Identifier,
+                          undefined
+                        );
+                      })
                 ),
                 undefined,
                 undefined,
@@ -116,12 +134,25 @@ export const toCurrentModule = async () => {
         undefined,
         [
           factory.createObjectLiteralExpression(
-            identifiersReferenceFromOuterScope.map((item) =>
-              factory.createShorthandPropertyAssignment(
-                item.sourceNode as ts.Identifier,
-                undefined
-              )
-            ),
+            thisFlag
+              ? [
+                  factory.createPropertyAssignment(
+                    factory.createIdentifier(doctor.constants.THIS),
+                    factory.createThis()
+                  ),
+                  ...identifiersReferenceFromOuterScope.map((item) =>
+                    factory.createShorthandPropertyAssignment(
+                      item.sourceNode as ts.Identifier,
+                      undefined
+                    )
+                  ),
+                ]
+              : identifiersReferenceFromOuterScope.map((item) =>
+                  factory.createShorthandPropertyAssignment(
+                    item.sourceNode as ts.Identifier,
+                    undefined
+                  )
+                ),
             false
           ),
         ]
