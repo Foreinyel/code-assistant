@@ -186,5 +186,5 @@ export const toCurrentModule = async () => {
 
   (parentBlockOfSelectedNodes!.sourceNode as any).statements = newStatements;
 
-  doctor.writeAstToFile(sourceFile!, fullFilename);
+  await doctor.writeAstToFile(sourceFile!, fullFilename);
 };

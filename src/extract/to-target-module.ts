@@ -4,8 +4,8 @@ import * as ts from "typescript";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
 import * as hm from "@hemyn/utils-node";
 import path from "path";
-
-const factory = ts.factory;
+import assert from "assert";
+import { ModuleNodeList } from "@fe-doctor/core";
 
 /**
  * 提取方法到公用模块
@@ -13,26 +13,20 @@ const factory = ts.factory;
 export const toTargetModule = async () => {
   const { nodeList, nodeIdsInSelectedNodes, rootPath, projectName } =
     getSelectedCodeInfo();
-  const {
-    selectedStatements,
-    identifierReferedByOuterScope,
-    identifiersReferenceFromOuterScope,
-    identifiersInGlobalScope,
-  } = doctor.findReferredIdentifiersOfNodeList(
+
+  const { selectedStatements } = doctor.findReferredIdentifiersOfNodeList(
     nodeList,
     nodeIdsInSelectedNodes
   );
 
-  const newFunctionName = (await vscode.window.showInputBox({
-    title: "test",
-    prompt: "please input new function name",
-    validateInput: (value) => {
-      if (!value) {
-        return "new function name required.";
-      }
-      return undefined;
-    },
-  })) as string;
+  // 一次只能移动一个statement，并且这个statement在module的全局中定义
+  assert.equal(selectedStatements.length, 1, "Only one statement at a time.");
+  const [selectedStatement] = selectedStatements;
+  assert.equal(
+    nodeList.find((item) => item.id === selectedStatement.parentId)?.kind,
+    ts.SyntaxKind.SourceFile,
+    "Selected statement should be in global scope of module."
+  );
 
   const filesInSrc = await hm.listFiles(path.resolve(rootPath, "src"));
   const targetModule = await vscode.window.showQuickPick(
@@ -59,90 +53,18 @@ export const toTargetModule = async () => {
 
   const targetNodeList = doctor.loadNodeListByFile(targetProgramFile);
 
-  // 创建一个函数
-  const newFunction = factory.createVariableStatement(
-    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    factory.createVariableDeclarationList(
-      [
-        factory.createVariableDeclaration(
-          factory.createIdentifier(newFunctionName),
-          undefined,
-          undefined,
-          factory.createArrowFunction(
-            undefined,
-            undefined,
-            [
-              factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                factory.createObjectBindingPattern(
-                  identifiersReferenceFromOuterScope.map((item) => {
-                    return factory.createBindingElement(
-                      undefined,
-                      undefined,
-                      item.sourceNode as ts.Identifier,
-                      undefined
-                    );
-                  })
-                ),
-                undefined,
-                undefined,
-                undefined
-              ),
-            ],
-            undefined,
-            factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-            factory.createBlock([
-              ...selectedStatements.map(
-                (item) => item.sourceNode as ts.Statement
-              ),
-              factory.createReturnStatement(
-                factory.createObjectLiteralExpression(
-                  identifierReferedByOuterScope.map((item) =>
-                    factory.createShorthandPropertyAssignment(
-                      item.sourceNode as ts.Identifier,
-                      undefined
-                    )
-                  ),
-                  false
-                )
-              ),
-            ])
-          )
-        ),
-      ],
-      ts.NodeFlags.Const
-    )
+  doctor.moveGlobalStatementToTargetModule(
+    selectedStatement.id,
+    new ModuleNodeList(selectedStatement.programFile, nodeList),
+    new ModuleNodeList(targetProgramFile, targetNodeList)
   );
 
-  const targetSourceFile = targetProgramFile.ast;
-
-  for (let nodeId of Array.from(identifiersInGlobalScope)) {
-    const identifier = nodeList.findById(nodeId);
-    if (!identifier) {
-      continue;
-    }
-    const definitionOfIdentifier = doctor.findDefinitionOfIdentifier(
-      identifier,
-      nodeList
-    );
-    if (!definitionOfIdentifier) {
-      continue;
-    }
-    console.log(
-      `🚀 ~ file: to-target-module.ts ~ line 130 ~ toTargetModule ~ definitionOfIdentifier`,
-      doctor.getNodeText(definitionOfIdentifier),
-      definitionOfIdentifier.kind
-    );
-
-    if (definitionOfIdentifier.kind === ts.SyntaxKind.ImportDeclaration) {
-      // todo import from
-    }
-  }
-
-  // 将新函数写入文件末尾
-  (targetSourceFile as any).statements = targetSourceFile?.statements.concat([
-    newFunction,
-  ]);
+  await doctor.writeAstToFile(
+    selectedStatement.programFile.ast!,
+    selectedStatement.programFile.getAbsolutePath()
+  );
+  await doctor.writeAstToFile(
+    targetProgramFile.ast!,
+    targetProgramFile.getAbsolutePath()
+  );
 };

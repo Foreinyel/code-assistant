@@ -48,7 +48,7 @@
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@fe-doctor/core": "0.0.48",
+    "@fe-doctor/core": "0.0.49",
     "@hemyn/utils-node": "^0.3.2",
     "typescript": "^4.7.4"
   },
