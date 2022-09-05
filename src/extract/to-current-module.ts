@@ -14,6 +14,7 @@ export const toCurrentModule = async () => {
     identifierReferedByOuterScope,
     identifiersReferenceFromOuterScope,
     thisFlag,
+    awaitFlag,
   } = doctor.findReferredIdentifiersOfNodeList(
     nodeList,
     nodeIdsInSelectedNodes
@@ -39,7 +40,9 @@ export const toCurrentModule = async () => {
           undefined,
           undefined,
           factory.createArrowFunction(
-            undefined,
+            awaitFlag
+              ? [factory.createModifier(ts.SyntaxKind.AsyncKeyword)]
+              : undefined,
             undefined,
             [
               factory.createParameterDeclaration(
@@ -129,34 +132,38 @@ export const toCurrentModule = async () => {
       newStatements.push(statement);
     } else if (!insert) {
       insert = true;
-      const caller = factory.createCallExpression(
-        factory.createIdentifier(newFunctionName),
-        undefined,
-        [
-          factory.createObjectLiteralExpression(
-            thisFlag
-              ? [
-                  factory.createPropertyAssignment(
-                    factory.createIdentifier(doctor.constants.THIS),
-                    factory.createThis()
-                  ),
-                  ...identifiersReferenceFromOuterScope.map((item) =>
+      let caller: ts.AwaitExpression | ts.CallExpression =
+        factory.createCallExpression(
+          factory.createIdentifier(newFunctionName),
+          undefined,
+          [
+            factory.createObjectLiteralExpression(
+              thisFlag
+                ? [
+                    factory.createPropertyAssignment(
+                      factory.createIdentifier(doctor.constants.THIS),
+                      factory.createThis()
+                    ),
+                    ...identifiersReferenceFromOuterScope.map((item) =>
+                      factory.createShorthandPropertyAssignment(
+                        item.sourceNode as ts.Identifier,
+                        undefined
+                      )
+                    ),
+                  ]
+                : identifiersReferenceFromOuterScope.map((item) =>
                     factory.createShorthandPropertyAssignment(
                       item.sourceNode as ts.Identifier,
                       undefined
                     )
                   ),
-                ]
-              : identifiersReferenceFromOuterScope.map((item) =>
-                  factory.createShorthandPropertyAssignment(
-                    item.sourceNode as ts.Identifier,
-                    undefined
-                  )
-                ),
-            false
-          ),
-        ]
-      );
+              false
+            ),
+          ]
+        );
+      if (awaitFlag) {
+        caller = factory.createAwaitExpression(caller);
+      }
       newStatements.push(
         identifierReferedByOuterScope?.length
           ? factory.createVariableDeclarationList(
