@@ -25,7 +25,7 @@ export const getSelectedCodeInfo = () => {
   );
   const nodeList = doctor.loadNodeListByFile(programFile);
 
-  doctor.initNodeList(nodeList, [programFile]);
+  // doctor.initNodeList(nodeList, [programFile]);
 
   const [selection] = selections;
 
