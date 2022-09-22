@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as extract from "./extract";
+import * as clean from "./clean";
 import { runCommand } from "./common";
 
 // this method is called when your extension is activated
@@ -23,6 +24,11 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "jvs-code-assistant.extract.toTargetModule",
     runCommand(extract.toTargetModule)
+  );
+
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.clean.sortGlobalStatementsInModule",
+    runCommand(clean.sortGlobalStatementsInModule)
   );
 }
 
