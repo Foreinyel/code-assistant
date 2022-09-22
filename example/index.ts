@@ -37,3 +37,13 @@ function b(values, field, result) {
     }
   }
 }
+
+function func_with_return() {
+  const f1 = 1;
+  const f2 = f1 + 2;
+  const f3 = () => {
+    return f1 * f2;
+  };
+
+  return f3();
+}
