@@ -15,6 +15,7 @@ export const toCurrentModule = async () => {
     identifiersReferenceFromOuterScope,
     thisFlag,
     awaitFlag,
+    returnFlag,
   } = doctor.findReferredIdentifiersOfNodeList(
     nodeList,
     nodeIdsInSelectedNodes
@@ -186,6 +187,8 @@ export const toCurrentModule = async () => {
               ],
               ts.NodeFlags.Const
             )
+          : returnFlag
+          ? factory.createReturnStatement(caller)
           : factory.createExpressionStatement(caller)
       );
     }
