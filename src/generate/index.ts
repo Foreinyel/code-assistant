@@ -1,1 +1,1 @@
-export * from "./newFunctionComponentInFolder";
+export * from "./new-function-component-in-folder";
