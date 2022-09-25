@@ -41,7 +41,7 @@
         "jvs-code-assistant.src": {
           "type": "string",
           "default": ".",
-          "description": "path of source folder relatived by root path."
+          "description": "path of source folder relatived from root path."
         }
       }
     }
