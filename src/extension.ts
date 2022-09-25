@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import * as extract from "./extract";
 import * as clean from "./clean";
+import * as generate from "./generate";
 import { runCommand } from "./common";
 
 // this method is called when your extension is activated
@@ -29,6 +30,11 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.sortGlobalStatementsInModule",
     runCommand(clean.sortGlobalStatementsInModule)
+  );
+
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.generate.newFunctionComponentInFolder",
+    runCommand(generate.newFunctionComponentInFolder)
   );
 }
 

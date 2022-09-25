@@ -1,6 +1,6 @@
-import { getDocumentInfo } from "./getDocumentInfo";
 import * as vscode from "vscode";
 import { strict as assert } from "assert";
+import { getDocumentInfo } from "./getDocumentInfo";
 export const getSelectedCodeInfo = () => {
   const {
     editor,
