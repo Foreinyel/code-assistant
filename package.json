@@ -82,5 +82,6 @@
     "@hemyn/utils-node": "^0.4.1",
     "typescript": "^4.7.4"
   },
-  "publisher": "Foreinyel"
+  "publisher": "Foreinyel",
+  "repository": "https://github.com/Foreinyel/code-assistant"
 }
