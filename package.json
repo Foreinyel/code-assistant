@@ -29,15 +29,15 @@
       },
       {
         "command": "jvs-code-assistant.clean.sortGlobalStatementsInModule",
-        "title": "Sort Global Statements"
+        "title": "Clean By Sort Global Statements"
       },
       {
         "command": "jvs-code-assistant.generate.newFunctionComponentInFolder",
-        "title": "New Function Component In Folder"
+        "title": "Generate New Function Component In Folder"
       },
       {
         "command": "jvs-code-assistant.generate.newFunctionComponentInModule",
-        "title": "New Function Component In Module"
+        "title": "Generate New Function Component In Module"
       }
     ],
     "configuration": {
