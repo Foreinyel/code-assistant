@@ -36,6 +36,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.generate.newFunctionComponentInFolder",
     runCommand(generate.newFunctionComponentInFolder)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.generate.newFunctionComponentInModule",
+    runCommand(generate.newFunctionComponentInModule)
+  );
 }
 
 // this method is called when your extension is deactivated

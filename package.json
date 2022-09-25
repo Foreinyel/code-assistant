@@ -13,7 +13,8 @@
     "onCommand:jvs-code-assistant.extract.toCurrentModule",
     "onCommand:jvs-code-assistant.extract.toTargetModule",
     "onCommand:jvs-code-assistant.clean.sortGlobalStatementsInModule",
-    "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder"
+    "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
+    "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
   "main": "./bundle/main.js",
   "contributes": {
@@ -33,6 +34,10 @@
       {
         "command": "jvs-code-assistant.generate.newFunctionComponentInFolder",
         "title": "New Function Component In Folder"
+      },
+      {
+        "command": "jvs-code-assistant.generate.newFunctionComponentInModule",
+        "title": "New Function Component In Module"
       }
     ],
     "configuration": {
