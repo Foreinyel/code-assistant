@@ -22,7 +22,7 @@ export const toCurrentModule = async () => {
   );
 
   const newFunctionName = (await vscode.window.showInputBox({
-    title: "test",
+    // title: "E",
     prompt: "please input new function name",
     validateInput: (value) => {
       if (!value) {

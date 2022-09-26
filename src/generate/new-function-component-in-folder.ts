@@ -10,7 +10,7 @@ import { getProjectInfo } from "../common/getProjectInfo";
 export const newFunctionComponentInFolder = async () => {
   const { rootPath, projectName } = getProjectInfo({});
   const newComponentName = (await vscode.window.showInputBox({
-    title: "test",
+    // title: "test",
     prompt: "please input new component name",
     validateInput: (value) => {
       if (!value) {
