@@ -31,6 +31,73 @@ export const toCurrentModule = async () => {
       return undefined;
     },
   })) as string;
+
+  let functionParameters: ts.ParameterDeclaration[] = [];
+  let argumentList: ts.ObjectLiteralExpression[] = [];
+  if (thisFlag || identifiersReferenceFromOuterScope?.length) {
+    functionParameters = [
+      factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        undefined,
+        factory.createObjectBindingPattern(
+          thisFlag
+            ? [
+                factory.createBindingElement(
+                  undefined,
+                  undefined,
+                  factory.createIdentifier(doctor.constants.THIS),
+                  undefined
+                ),
+                ...identifiersReferenceFromOuterScope.map((item) => {
+                  return factory.createBindingElement(
+                    undefined,
+                    undefined,
+                    item.sourceNode as ts.Identifier,
+                    undefined
+                  );
+                }),
+              ]
+            : identifiersReferenceFromOuterScope.map((item) => {
+                return factory.createBindingElement(
+                  undefined,
+                  undefined,
+                  item.sourceNode as ts.Identifier,
+                  undefined
+                );
+              })
+        ),
+        undefined,
+        undefined,
+        undefined
+      ),
+    ];
+    argumentList = [
+      factory.createObjectLiteralExpression(
+        thisFlag
+          ? [
+              factory.createPropertyAssignment(
+                factory.createIdentifier(doctor.constants.THIS),
+                factory.createThis()
+              ),
+              ...identifiersReferenceFromOuterScope.map((item) =>
+                factory.createShorthandPropertyAssignment(
+                  item.sourceNode as ts.Identifier,
+                  undefined
+                )
+              ),
+            ]
+          : identifiersReferenceFromOuterScope.map((item) =>
+              factory.createShorthandPropertyAssignment(
+                item.sourceNode as ts.Identifier,
+                undefined
+              )
+            ),
+        false
+      ),
+    ];
+  }
+
   // 创建一个函数
   const newFunction = factory.createVariableStatement(
     undefined,
@@ -45,43 +112,7 @@ export const toCurrentModule = async () => {
               ? [factory.createModifier(ts.SyntaxKind.AsyncKeyword)]
               : undefined,
             undefined,
-            [
-              factory.createParameterDeclaration(
-                undefined,
-                undefined,
-                undefined,
-                factory.createObjectBindingPattern(
-                  thisFlag
-                    ? [
-                        factory.createBindingElement(
-                          undefined,
-                          undefined,
-                          factory.createIdentifier(doctor.constants.THIS),
-                          undefined
-                        ),
-                        ...identifiersReferenceFromOuterScope.map((item) => {
-                          return factory.createBindingElement(
-                            undefined,
-                            undefined,
-                            item.sourceNode as ts.Identifier,
-                            undefined
-                          );
-                        }),
-                      ]
-                    : identifiersReferenceFromOuterScope.map((item) => {
-                        return factory.createBindingElement(
-                          undefined,
-                          undefined,
-                          item.sourceNode as ts.Identifier,
-                          undefined
-                        );
-                      })
-                ),
-                undefined,
-                undefined,
-                undefined
-              ),
-            ],
+            functionParameters,
             undefined,
             factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
             factory.createBlock(
@@ -137,30 +168,7 @@ export const toCurrentModule = async () => {
         factory.createCallExpression(
           factory.createIdentifier(newFunctionName),
           undefined,
-          [
-            factory.createObjectLiteralExpression(
-              thisFlag
-                ? [
-                    factory.createPropertyAssignment(
-                      factory.createIdentifier(doctor.constants.THIS),
-                      factory.createThis()
-                    ),
-                    ...identifiersReferenceFromOuterScope.map((item) =>
-                      factory.createShorthandPropertyAssignment(
-                        item.sourceNode as ts.Identifier,
-                        undefined
-                      )
-                    ),
-                  ]
-                : identifiersReferenceFromOuterScope.map((item) =>
-                    factory.createShorthandPropertyAssignment(
-                      item.sourceNode as ts.Identifier,
-                      undefined
-                    )
-                  ),
-              false
-            ),
-          ]
+          argumentList
         );
       if (awaitFlag) {
         caller = factory.createAwaitExpression(caller);

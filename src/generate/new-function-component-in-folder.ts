@@ -24,11 +24,16 @@ export const newFunctionComponentInFolder = async () => {
     return;
   }
   const configuration = vscode.workspace.getConfiguration("jvs-code-assistant");
-  let folderList = await hm.listFolders(
+  const folderList = await hm.listFolders(
     path.resolve(rootPath, configuration.src),
-    [path.resolve(rootPath, "node_modules")]
+    [
+      path.resolve(rootPath, "node_modules"),
+      ...(configuration.excludes as string[]).map((item) =>
+        path.resolve(rootPath, configuration.src, item)
+      ),
+    ]
   );
-  folderList = folderList.filter((item) => item.indexOf("node_modules") < 0);
+  // folderList = folderList.filter((item) => item.indexOf("node_modules") < 0);
   const targetFolder = await vscode.window.showQuickPick(
     folderList.map((item) => path.relative(rootPath, item)),
     {

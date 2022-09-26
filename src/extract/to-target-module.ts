@@ -25,9 +25,20 @@ export const toTargetModule = async () => {
     "Selected statement should be in global scope of module."
   );
   const configuration = vscode.workspace.getConfiguration("jvs-code-assistant");
-  const filesInSrc = await hm.listFiles(
-    path.resolve(rootPath, configuration.src)
+  let filesInSrc = await hm.listFiles(
+    path.resolve(rootPath, configuration.src),
+    [
+      path.resolve(rootPath, "node_modules"),
+      ...(configuration.excludes as string[]).map((item) =>
+        path.resolve(rootPath, configuration.src, item)
+      ),
+    ]
   );
+
+  filesInSrc = filesInSrc.filter(
+    (item) => item.endsWith("ts") || item.endsWith("tsx")
+  );
+
   const targetModule = await vscode.window.showQuickPick(
     filesInSrc.map((item) => path.relative(rootPath, item)),
     {
