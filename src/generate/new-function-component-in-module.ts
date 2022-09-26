@@ -47,13 +47,39 @@ export const newFunctionComponentInModule = async () => {
     return;
   }
 
+  let newNodeList;
+
+  let isReactImported = false;
+  if (
+    nodeList.find(
+      (item) =>
+        item.kind === ts.SyntaxKind.Identifier &&
+        (item.sourceNode as ts.Identifier)?.escapedText === "React"
+    )
+  ) {
+    isReactImported = true;
+  }
+
+  if (!isReactImported) {
+    newNodeList = doctor.batchImportFrom(
+      [
+        {
+          allAlias: "React",
+          moduleSpecifier: "react",
+        },
+      ],
+      nodeList,
+      programFile
+    );
+  }
+
   (sourceFile as any).statements = [
     ...(sourceFile as any).statements,
     interfaceOfProps,
     component,
   ];
 
-  const newNodeList = doctor.reloadModuleNodeList(programFile);
+  newNodeList = doctor.reloadModuleNodeList(programFile);
 
   const module = doctor.sortGlobalStatementsInModule(
     new doctor.ModuleNodeList(programFile, newNodeList)

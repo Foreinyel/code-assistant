@@ -1,9 +1,13 @@
-import React from "react";
+import * as React from "react";
+interface ButtonProps {}
+interface LinkProps {}
 interface PrimaryButtonProps {}
-const PrimaryButton: React.FC<PrimaryButtonProps> = (props) => {
+const Button: React.FC<ButtonProps> = (props) => {
   return <div />;
 };
-export interface ButtonProps {}
-export const Button: React.FC<ButtonProps> = (props) => {
+const Link: React.FC<LinkProps> = (props) => {
+  return <div />;
+};
+const PrimaryButton: React.FC<PrimaryButtonProps> = (props) => {
   return <div />;
 };
