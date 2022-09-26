@@ -10,7 +10,7 @@ export const getSelectedCodeInfo = () => {
     fullFilename,
     rootPath,
     projectName,
-  } = getDocumentInfo({});
+  } = getDocumentInfo();
   // todo: validate if it's right code block, extracted code must be in one big block
   const { selections } = editor;
   assert.ok(selections.length === 1 && !!document, "invalid selections");

@@ -8,7 +8,7 @@ import { getProjectInfo } from "../common/getProjectInfo";
  * @description 在文件夹中创建组件
  */
 export const newFunctionComponentInFolder = async () => {
-  const { rootPath, projectName } = getProjectInfo({});
+  const { rootPath, projectName } = getProjectInfo();
   const newComponentName = (await vscode.window.showInputBox({
     // title: "test",
     prompt: "please input new component name",

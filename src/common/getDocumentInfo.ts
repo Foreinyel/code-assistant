@@ -3,8 +3,8 @@ import * as path from "path";
 import { strict as assert } from "assert";
 import * as vscode from "vscode";
 import { getProjectInfo } from "./getProjectInfo";
-export const getDocumentInfo = ({}) => {
-  const { editor, rootPath, projectName } = getProjectInfo({});
+export const getDocumentInfo = () => {
+  const { editor, rootPath, projectName } = getProjectInfo();
   assert.ok(!!editor, "invalid editor.");
   const { document } = editor;
   const fullFilename = document.fileName;

@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import * as vscode from "vscode";
-export const getProjectInfo = ({}) => {
+export const getProjectInfo = () => {
   const editor = vscode.window.activeTextEditor;
   const workspace = vscode.workspace;
   assert.ok(workspace.workspaceFolders?.length === 1, "invalid workspace");

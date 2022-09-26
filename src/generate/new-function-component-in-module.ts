@@ -7,9 +7,7 @@ import ts from "typescript";
  * @description 在当前模块创建组件
  */
 export const newFunctionComponentInModule = async () => {
-  const { nodeList, sourceFile, programFile, fullFilename } = getDocumentInfo(
-    {}
-  );
+  const { nodeList, sourceFile, programFile, fullFilename } = getDocumentInfo();
 
   if (!fullFilename.endsWith(".tsx")) {
     vscode.window.showErrorMessage(`Module must end with 'tsx'`);
