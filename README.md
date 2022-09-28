@@ -6,9 +6,11 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 ### Extract
 
-#### extract code to current module
+#### extract statements to current module
 
-#### extract code to target module
+#### extract statement to target module
+
+#### extract elements to component
 
 ### Clean
 

@@ -26,6 +26,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.extract.toTargetModule",
     runCommand(extract.toTargetModule)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.toComponent",
+    runCommand(extract.toComponent)
+  );
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.sortGlobalStatementsInModule",
