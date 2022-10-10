@@ -16,6 +16,8 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### sort global statements
 
+#### remove unused code
+
 ### Generate
 
 #### generate new function component in folder
