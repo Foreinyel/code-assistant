@@ -15,10 +15,11 @@
     "onCommand:jvs-code-assistant.extract.toTargetModule",
     "onCommand:jvs-code-assistant.extract.toComponent",
     "onCommand:jvs-code-assistant.clean.sortGlobalStatementsInModule",
+    "onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
-  "main": "./bundle/main.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -36,6 +37,10 @@
       {
         "command": "jvs-code-assistant.clean.sortGlobalStatementsInModule",
         "title": "Clean By Sort Global Statements"
+      },
+      {
+        "command": "jvs-code-assistant.clean.removeUnusedCodeInModule",
+        "title": "Clean By Remove Unused Code In Module"
       },
       {
         "command": "jvs-code-assistant.generate.newFunctionComponentInFolder",
