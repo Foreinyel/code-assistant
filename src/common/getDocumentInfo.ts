@@ -16,7 +16,7 @@ export const getDocumentInfo = () => {
     relativePath,
     filename
   );
-  const nodeList = doctor.loadNodeListByFile(programFile);
+  const nodeList = doctor.loadNodeListByFile(programFile, undefined, true);
   const sourceFile = programFile.ast;
   return {
     editor,
