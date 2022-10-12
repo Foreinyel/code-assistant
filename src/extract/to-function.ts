@@ -62,7 +62,33 @@ export const extractCodeToFunction = async () => {
               })
         ),
         undefined,
-        undefined,
+        factory.createTypeLiteralNode(
+          thisFlag
+            ? [
+                factory.createPropertySignature(
+                  undefined,
+                  factory.createIdentifier(doctor.constants.THIS),
+                  undefined,
+                  factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                ),
+                ...identifiersReferenceFromOuterScope.map((item) => {
+                  return factory.createPropertySignature(
+                    undefined,
+                    item.sourceNode as ts.Identifier,
+                    undefined,
+                    factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                  );
+                }),
+              ]
+            : identifiersReferenceFromOuterScope.map((item) => {
+                return factory.createPropertySignature(
+                  undefined,
+                  item.sourceNode as ts.Identifier,
+                  undefined,
+                  factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                );
+              })
+        ),
         undefined
       ),
     ];
