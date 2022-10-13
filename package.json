@@ -2,7 +2,7 @@
   "name": "jvs-code-assistant",
   "displayName": "jvs-code-assistant",
   "description": "",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "engines": {
     "vscode": "^1.69.0"
   },
