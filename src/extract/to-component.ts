@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
+import { findChildrenOfNode } from "@fe-doctor/core";
 
 const factory = ts.factory;
 
@@ -23,13 +24,51 @@ export const toComponent = async () => {
     },
   })) as string;
 
+  const membersOfThis: Set<string> = new Set();
+
+  for (let nodeId of nodeIdsInSelectedNodes.values()) {
+    const node = nodeList.findById(nodeId);
+    if (
+      node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
+      (node.sourceNode as ts.PropertyAccessExpression).expression.kind ===
+        ts.SyntaxKind.ThisKeyword
+    ) {
+      membersOfThis.add(
+        (node.sourceNode as ts.PropertyAccessExpression).name
+          .escapedText as string
+      );
+      (node.sourceNode as any).expression =
+        ts.factory.createIdentifier("props");
+    }
+  }
+
+  // if (membersOfThis.size > 0) {
+  //   // replace all `this` to `props`
+  //   for (let statement of selectedStatements) {
+  //     const children = findChildrenOfNode(statement, nodeList);
+  //     for (let child of children) {
+  //       if (
+  //         child.kind === ts.SyntaxKind.PropertyAccessExpression &&
+  //         (child.sourceNode as ts.PropertyAccessExpression).expression.kind ===
+  //           ts.SyntaxKind.ThisKeyword
+  //       ) {
+  //         (child.sourceNode as any).expression =
+  //           ts.factory.createIdentifier("props");
+  //       }
+  //     }
+  //   }
+  // }
+
   const { interfaceOfProps, component, componentName } =
     doctor.generateFunctionComponent(
       newFunctionName,
       false,
-      identifiersReferenceFromOuterScope.map(
-        (item) => (item.sourceNode as ts.Identifier).escapedText as string
-      ),
+      [
+        ...identifiersReferenceFromOuterScope.map(
+          (item) => (item.sourceNode as ts.Identifier).escapedText as string
+        ),
+        ...Array.from(membersOfThis),
+      ],
       selectedStatements.filter((item) => {
         if (
           item.kind === ts.SyntaxKind.JsxText &&
@@ -50,8 +89,8 @@ export const toComponent = async () => {
   const componentElement = factory.createJsxSelfClosingElement(
     factory.createIdentifier(componentName),
     undefined,
-    factory.createJsxAttributes(
-      identifiersReferenceFromOuterScope.map((item) =>
+    factory.createJsxAttributes([
+      ...identifiersReferenceFromOuterScope.map((item) =>
         factory.createJsxAttribute(
           factory.createIdentifier(
             (item.sourceNode as ts.Identifier).escapedText as string
@@ -63,8 +102,20 @@ export const toComponent = async () => {
             )
           )
         )
-      )
-    )
+      ),
+      ...Array.from(membersOfThis).map((item) => {
+        return factory.createJsxAttribute(
+          factory.createIdentifier(item),
+          factory.createJsxExpression(
+            undefined,
+            factory.createPropertyAccessExpression(
+              factory.createThis(),
+              factory.createIdentifier(item)
+            )
+          )
+        );
+      }),
+    ])
   );
 
   const parentNodeOfSelectedNodes = nodeList.findById(
