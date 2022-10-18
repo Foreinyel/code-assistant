@@ -8,7 +8,6 @@ import { extractCodeToFunction, factory } from "./to-function";
 export const toCurrentModule = async () => {
   const {
     sourceFile,
-    newFunction,
     nodeList,
     selectedStatements,
     newFunctionName,
@@ -48,16 +47,19 @@ export const toCurrentModule = async () => {
           ? factory.createVariableDeclarationList(
               [
                 factory.createVariableDeclaration(
-                  factory.createObjectBindingPattern(
-                    identifierReferedByOuterScope.map((item) =>
-                      factory.createBindingElement(
-                        undefined,
-                        undefined,
-                        item.sourceNode as ts.Identifier,
-                        undefined
-                      )
-                    )
-                  ),
+                  identifierReferedByOuterScope?.length === 1
+                    ? (identifierReferedByOuterScope[0]
+                        .sourceNode as ts.Identifier)
+                    : factory.createObjectBindingPattern(
+                        identifierReferedByOuterScope.map((item) =>
+                          factory.createBindingElement(
+                            undefined,
+                            undefined,
+                            item.sourceNode as ts.Identifier,
+                            undefined
+                          )
+                        )
+                      ),
                   undefined,
                   undefined,
                   caller

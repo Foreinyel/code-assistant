@@ -2,6 +2,103 @@ import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
+
+type FunctionArgument = ts.Identifier | ts.ThisExpression;
+
+const generateFunctionParameters = (
+  thisFlag: boolean,
+  identifierNodes: doctor.Node[]
+) => {
+  const functionParameters: ts.ParameterDeclaration[] = [];
+  if (thisFlag) {
+    functionParameters.push(
+      factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        undefined,
+        factory.createIdentifier(doctor.constants.THIS),
+        undefined,
+        factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+      )
+    );
+  }
+  if (identifierNodes.length) {
+    functionParameters.push(
+      ...identifierNodes.map((identifierNode) =>
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          undefined,
+          identifierNode.sourceNode as ts.Identifier,
+          undefined,
+          factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+        )
+      )
+    );
+  }
+  return functionParameters;
+};
+
+const generateArgumentList = (
+  thisFlag: boolean,
+  identifierNodes: doctor.Node[]
+) => {
+  const argumentList: FunctionArgument[] = [];
+  if (thisFlag) {
+    argumentList.push(factory.createThis());
+  }
+  argumentList.push(
+    ...identifierNodes.map(
+      (identifierNode) => identifierNode.sourceNode as ts.Identifier
+    )
+  );
+  return argumentList;
+};
+
+const generateFunctionBody = (
+  nodeList: doctor.NodeList,
+  nodeIdsInSelectedNodes: Set<number>,
+  replaceThisWithParameter: boolean,
+  identifierReferedByOuterScope: doctor.Node[],
+  statements: doctor.Node[]
+) => {
+  if (replaceThisWithParameter) {
+    for (let nodeId of nodeIdsInSelectedNodes.values()) {
+      const node = nodeList.findById(nodeId);
+      if (
+        node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
+        (node.sourceNode as ts.PropertyAccessExpression).expression.kind ===
+          ts.SyntaxKind.ThisKeyword
+      ) {
+        (node.sourceNode as any).expression = ts.factory.createIdentifier(
+          doctor.constants.THIS
+        );
+      }
+    }
+  }
+
+  const bodyStatements = [
+    ...statements.map((statement) => statement.sourceNode),
+  ];
+  if (identifierReferedByOuterScope.length) {
+    const returnStatement = factory.createReturnStatement(
+      identifierReferedByOuterScope.length > 1
+        ? factory.createObjectLiteralExpression(
+            identifierReferedByOuterScope.map((item) =>
+              factory.createShorthandPropertyAssignment(
+                item.sourceNode as ts.Identifier,
+                undefined
+              )
+            ),
+            false
+          )
+        : (identifierReferedByOuterScope[0].sourceNode as ts.Identifier)
+    );
+    bodyStatements.push(returnStatement);
+  }
+  return bodyStatements as ts.Statement[];
+};
+
 export const extractCodeToFunction = async () => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
@@ -26,97 +123,13 @@ export const extractCodeToFunction = async () => {
     },
   })) as string;
 
-  let functionParameters: ts.ParameterDeclaration[] = [];
-  let argumentList: ts.ObjectLiteralExpression[] = [];
-  if (thisFlag || identifiersReferenceFromOuterScope?.length) {
-    functionParameters = [
-      factory.createParameterDeclaration(
-        undefined,
-        undefined,
-        undefined,
-        factory.createObjectBindingPattern(
-          thisFlag
-            ? [
-                factory.createBindingElement(
-                  undefined,
-                  undefined,
-                  factory.createIdentifier(doctor.constants.THIS),
-                  undefined
-                ),
-                ...identifiersReferenceFromOuterScope.map((item) => {
-                  return factory.createBindingElement(
-                    undefined,
-                    undefined,
-                    item.sourceNode as ts.Identifier,
-                    undefined
-                  );
-                }),
-              ]
-            : identifiersReferenceFromOuterScope.map((item) => {
-                return factory.createBindingElement(
-                  undefined,
-                  undefined,
-                  item.sourceNode as ts.Identifier,
-                  undefined
-                );
-              })
-        ),
-        undefined,
-        factory.createTypeLiteralNode(
-          thisFlag
-            ? [
-                factory.createPropertySignature(
-                  undefined,
-                  factory.createIdentifier(doctor.constants.THIS),
-                  undefined,
-                  factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-                ),
-                ...identifiersReferenceFromOuterScope.map((item) => {
-                  return factory.createPropertySignature(
-                    undefined,
-                    item.sourceNode as ts.Identifier,
-                    undefined,
-                    factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-                  );
-                }),
-              ]
-            : identifiersReferenceFromOuterScope.map((item) => {
-                return factory.createPropertySignature(
-                  undefined,
-                  item.sourceNode as ts.Identifier,
-                  undefined,
-                  factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-                );
-              })
-        ),
-        undefined
-      ),
-    ];
-    argumentList = [
-      factory.createObjectLiteralExpression(
-        thisFlag
-          ? [
-              factory.createPropertyAssignment(
-                factory.createIdentifier(doctor.constants.THIS),
-                factory.createThis()
-              ),
-              ...identifiersReferenceFromOuterScope.map((item) =>
-                factory.createShorthandPropertyAssignment(
-                  item.sourceNode as ts.Identifier,
-                  undefined
-                )
-              ),
-            ]
-          : identifiersReferenceFromOuterScope.map((item) =>
-              factory.createShorthandPropertyAssignment(
-                item.sourceNode as ts.Identifier,
-                undefined
-              )
-            ),
-        false
-      ),
-    ];
-  }
+  const functionParameters: ts.ParameterDeclaration[] =
+    generateFunctionParameters(thisFlag, identifiersReferenceFromOuterScope);
+  const argumentList: FunctionArgument[] = generateArgumentList(
+    thisFlag,
+    identifiersReferenceFromOuterScope
+  );
+
   const newFunction = factory.createVariableStatement(
     undefined,
     factory.createVariableDeclarationList(
@@ -134,28 +147,13 @@ export const extractCodeToFunction = async () => {
             undefined,
             factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
             factory.createBlock(
-              identifierReferedByOuterScope?.length
-                ? [
-                    ...selectedStatements.map(
-                      (item) => item.sourceNode as ts.Statement
-                    ),
-                    factory.createReturnStatement(
-                      factory.createObjectLiteralExpression(
-                        identifierReferedByOuterScope.map((item) =>
-                          factory.createShorthandPropertyAssignment(
-                            item.sourceNode as ts.Identifier,
-                            undefined
-                          )
-                        ),
-                        false
-                      )
-                    ),
-                  ]
-                : [
-                    ...selectedStatements.map(
-                      (item) => item.sourceNode as ts.Statement
-                    ),
-                  ]
+              generateFunctionBody(
+                nodeList,
+                nodeIdsInSelectedNodes,
+                thisFlag,
+                identifierReferedByOuterScope,
+                selectedStatements
+              )
             )
           )
         ),

@@ -2,10 +2,7 @@ import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
-import { findChildrenOfNode } from "@fe-doctor/core";
-
 const factory = ts.factory;
-
 /**
  * @description 提取element到独立组件
  */
@@ -23,9 +20,7 @@ export const toComponent = async () => {
       return undefined;
     },
   })) as string;
-
   const membersOfThis: Set<string> = new Set();
-
   for (let nodeId of nodeIdsInSelectedNodes.values()) {
     const node = nodeList.findById(nodeId);
     if (
@@ -41,24 +36,6 @@ export const toComponent = async () => {
         ts.factory.createIdentifier("props");
     }
   }
-
-  // if (membersOfThis.size > 0) {
-  //   // replace all `this` to `props`
-  //   for (let statement of selectedStatements) {
-  //     const children = findChildrenOfNode(statement, nodeList);
-  //     for (let child of children) {
-  //       if (
-  //         child.kind === ts.SyntaxKind.PropertyAccessExpression &&
-  //         (child.sourceNode as ts.PropertyAccessExpression).expression.kind ===
-  //           ts.SyntaxKind.ThisKeyword
-  //       ) {
-  //         (child.sourceNode as any).expression =
-  //           ts.factory.createIdentifier("props");
-  //       }
-  //     }
-  //   }
-  // }
-
   const { interfaceOfProps, component, componentName } =
     doctor.generateFunctionComponent(
       newFunctionName,
@@ -79,13 +56,11 @@ export const toComponent = async () => {
         return true;
       })
     );
-
   (sourceFile as any).statements = [
     ...sourceFile!.statements,
     interfaceOfProps,
     component,
   ];
-
   const componentElement = factory.createJsxSelfClosingElement(
     factory.createIdentifier(componentName),
     undefined,
@@ -117,11 +92,9 @@ export const toComponent = async () => {
       }),
     ])
   );
-
   const parentNodeOfSelectedNodes = nodeList.findById(
     selectedStatements[0].parentId
   );
-
   if (
     parentNodeOfSelectedNodes?.kind === ts.SyntaxKind.ParenthesizedExpression
   ) {
@@ -142,6 +115,5 @@ export const toComponent = async () => {
     }
     (parentNodeOfSelectedNodes!.sourceNode as any).children = newChilren;
   }
-
   await doctor.writeAstToFile(sourceFile!, fullFilename);
 };
