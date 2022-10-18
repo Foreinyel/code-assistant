@@ -32,8 +32,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   vscode.commands.registerCommand(
-    "jvs-code-assistant.clean.sortGlobalStatementsInModule",
-    runCommand(clean.sortGlobalStatementsInModule)
+    "jvs-code-assistant.clean.reorderGlobalStatements",
+    runCommand(clean.reorderGlobalStatements)
   );
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.removeUnusedCodeInModule",

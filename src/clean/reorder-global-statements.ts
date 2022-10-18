@@ -1,0 +1,11 @@
+import * as doctor from "@fe-doctor/core";
+import { ModuleNodeList } from "@fe-doctor/core";
+import { getDocumentInfo } from "../common/getDocumentInfo";
+
+export const reorderGlobalStatements = async () => {
+  const { nodeList, fullFilename, programFile } = getDocumentInfo();
+  const module = doctor.reorderGlobalStatements(
+    new ModuleNodeList(programFile, nodeList)
+  );
+  await doctor.writeAstToFile(module.programFile.ast!, fullFilename);
+};
