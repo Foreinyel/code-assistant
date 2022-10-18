@@ -4,7 +4,7 @@ import { getDocumentInfo } from "../common/getDocumentInfo";
 
 export const sortGlobalStatementsInModule = async () => {
   const { nodeList, fullFilename, programFile } = getDocumentInfo();
-  const module = doctor.sortGlobalStatementsInModule(
+  const module = doctor.reorderGlobalStatements(
     new ModuleNodeList(programFile, nodeList)
   );
   await doctor.writeAstToFile(module.programFile.ast!, fullFilename);
