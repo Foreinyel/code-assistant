@@ -96,7 +96,11 @@ export const toComponent = async () => {
     selectedStatements[0].parentId
   );
   if (
-    parentNodeOfSelectedNodes?.kind === ts.SyntaxKind.ParenthesizedExpression
+    parentNodeOfSelectedNodes?.kind &&
+    [
+      ts.SyntaxKind.ParenthesizedExpression,
+      ts.SyntaxKind.JsxExpression,
+    ].includes(parentNodeOfSelectedNodes?.kind)
   ) {
     (parentNodeOfSelectedNodes.sourceNode as any).expression = componentElement;
   } else if (parentNodeOfSelectedNodes?.kind === ts.SyntaxKind.JsxElement) {
