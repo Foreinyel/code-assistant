@@ -92,9 +92,7 @@ export const toComponent = async () => {
       }),
     ])
   );
-  const parentNodeOfSelectedNodes = nodeList.findById(
-    selectedStatements[0].parentId
-  );
+  const parentNodeOfSelectedNodes = selectedStatements[0].father;
   if (
     parentNodeOfSelectedNodes?.kind &&
     [
@@ -103,7 +101,11 @@ export const toComponent = async () => {
     ].includes(parentNodeOfSelectedNodes?.kind)
   ) {
     (parentNodeOfSelectedNodes.sourceNode as any).expression = componentElement;
-  } else if (parentNodeOfSelectedNodes?.kind === ts.SyntaxKind.JsxElement) {
+  } else if (
+    [ts.SyntaxKind.JsxElement, ts.SyntaxKind.JsxFragment].includes(
+      parentNodeOfSelectedNodes?.kind!
+    )
+  ) {
     const newChilren = [];
     let insert = false;
     const originSelectedStatements = selectedStatements.map(
