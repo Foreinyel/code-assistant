@@ -16,6 +16,7 @@ export const toCurrentModule = async () => {
     identifierReferedByOuterScope,
     returnFlag,
     fullFilename,
+    identifiersReassigned,
   } = await extractCodeToFunction();
 
   // 用新函数代替选择的函数体
@@ -42,20 +43,29 @@ export const toCurrentModule = async () => {
       if (awaitFlag) {
         caller = factory.createAwaitExpression(caller);
       }
-      newStatements.push(
-        identifierReferedByOuterScope?.length
-          ? factory.createVariableDeclarationList(
+
+      const identifiersShouldReturn: ts.Identifier[] = [];
+      for (let identifier of identifierReferedByOuterScope) {
+        identifiersShouldReturn.push(identifier.sourceNode as ts.Identifier);
+      }
+      for (let identifierName of identifiersReassigned) {
+        const identifier = ts.factory.createIdentifier(identifierName);
+        identifiersShouldReturn.push(identifier);
+      }
+      if (identifiersShouldReturn?.length) {
+        if (!identifiersReassigned.size) {
+          newStatements.push(
+            factory.createVariableDeclarationList(
               [
                 factory.createVariableDeclaration(
-                  identifierReferedByOuterScope?.length === 1
-                    ? (identifierReferedByOuterScope[0]
-                        .sourceNode as ts.Identifier)
+                  identifiersShouldReturn?.length === 1
+                    ? identifiersShouldReturn[0]
                     : factory.createObjectBindingPattern(
-                        identifierReferedByOuterScope.map((item) =>
+                        identifiersShouldReturn.map((item) =>
                           factory.createBindingElement(
                             undefined,
                             undefined,
-                            item.sourceNode as ts.Identifier,
+                            item,
                             undefined
                           )
                         )
@@ -67,10 +77,49 @@ export const toCurrentModule = async () => {
               ],
               ts.NodeFlags.Const
             )
-          : returnFlag
-          ? factory.createReturnStatement(caller)
-          : factory.createExpressionStatement(caller)
-      );
+          );
+        } else {
+          for (let identifier of identifierReferedByOuterScope) {
+            newStatements.push(
+              factory.createVariableStatement(
+                undefined,
+                factory.createVariableDeclarationList(
+                  [
+                    factory.createVariableDeclaration(
+                      identifier.sourceNode as ts.Identifier
+                    ),
+                  ],
+                  ts.NodeFlags.Let
+                )
+              )
+            );
+          }
+          newStatements.push(
+            factory.createExpressionStatement(
+              factory.createParenthesizedExpression(
+                factory.createBinaryExpression(
+                  identifiersShouldReturn.length === 1
+                    ? identifiersShouldReturn[0]
+                    : factory.createObjectLiteralExpression(
+                        identifiersShouldReturn.map((item) =>
+                          factory.createShorthandPropertyAssignment(
+                            item,
+                            undefined
+                          )
+                        )
+                      ),
+                  factory.createToken(ts.SyntaxKind.EqualsToken),
+                  caller
+                )
+              )
+            )
+          );
+        }
+      } else if (returnFlag) {
+        newStatements.push(factory.createReturnStatement(caller));
+      } else {
+        newStatements.push(factory.createExpressionStatement(caller));
+      }
     }
   }
   (parentBlockOfSelectedNodes!.sourceNode as any).statements = newStatements;

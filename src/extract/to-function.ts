@@ -60,7 +60,8 @@ const generateFunctionBody = (
   nodeIdsInSelectedNodes: Set<number>,
   replaceThisWithParameter: boolean,
   identifierReferedByOuterScope: doctor.Node[],
-  statements: doctor.Node[]
+  statements: doctor.Node[],
+  identifiersReassigned: Set<string>
 ) => {
   if (replaceThisWithParameter) {
     for (let nodeId of nodeIdsInSelectedNodes.values()) {
@@ -80,19 +81,23 @@ const generateFunctionBody = (
   const bodyStatements = [
     ...statements.map((statement) => statement.sourceNode),
   ];
-  if (identifierReferedByOuterScope.length) {
+  if (identifierReferedByOuterScope.length || identifiersReassigned.size) {
+    const objectLiteralElements: ts.Identifier[] = [];
+    for (let identifier of identifierReferedByOuterScope) {
+      objectLiteralElements.push(identifier.sourceNode as ts.Identifier);
+    }
+    for (let name of identifiersReassigned) {
+      objectLiteralElements.push(ts.factory.createIdentifier(name));
+    }
     const returnStatement = factory.createReturnStatement(
-      identifierReferedByOuterScope.length > 1
+      objectLiteralElements.length > 1
         ? factory.createObjectLiteralExpression(
-            identifierReferedByOuterScope.map((item) =>
-              factory.createShorthandPropertyAssignment(
-                item.sourceNode as ts.Identifier,
-                undefined
-              )
+            objectLiteralElements.map((item) =>
+              factory.createShorthandPropertyAssignment(item, undefined)
             ),
             false
           )
-        : (identifierReferedByOuterScope[0].sourceNode as ts.Identifier)
+        : objectLiteralElements[0]
     );
     bodyStatements.push(returnStatement);
   }
@@ -109,10 +114,8 @@ export const extractCodeToFunction = async () => {
     thisFlag,
     awaitFlag,
     returnFlag,
-  } = doctor.findReferredIdentifiersOfNodeList(
-    nodeList,
-    nodeIdsInSelectedNodes
-  );
+    identifiersReassigned,
+  } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   const newFunctionName = (await vscode.window.showInputBox({
     prompt: "please input new function name",
     validateInput: (value) => {
@@ -152,7 +155,8 @@ export const extractCodeToFunction = async () => {
                 nodeIdsInSelectedNodes,
                 thisFlag,
                 identifierReferedByOuterScope,
-                selectedStatements
+                selectedStatements,
+                identifiersReassigned
               )
             )
           )
@@ -174,6 +178,7 @@ export const extractCodeToFunction = async () => {
     identifierReferedByOuterScope,
     returnFlag,
     fullFilename,
+    identifiersReassigned,
   };
 };
 export const factory = ts.factory;
