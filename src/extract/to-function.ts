@@ -2,6 +2,7 @@ import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
+import { getIdentifierName } from "@fe-doctor/core";
 
 type FunctionArgument = ts.Identifier | ts.ThisExpression;
 
@@ -83,8 +84,13 @@ const generateFunctionBody = (
   ];
   if (identifierReferedByOuterScope.length || identifiersReassigned.size) {
     const objectLiteralElements: ts.Identifier[] = [];
+    const objectLiteralElementsSet: Set<string> = new Set();
     for (let identifier of identifierReferedByOuterScope) {
-      objectLiteralElements.push(identifier.sourceNode as ts.Identifier);
+      const identifierName = getIdentifierName(identifier);
+      if (!objectLiteralElementsSet.has(identifierName)) {
+        objectLiteralElementsSet.add(identifierName);
+        objectLiteralElements.push(ts.factory.createIdentifier(identifierName));
+      }
     }
     for (let name of identifiersReassigned) {
       objectLiteralElements.push(ts.factory.createIdentifier(name));

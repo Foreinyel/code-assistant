@@ -1,4 +1,5 @@
 import * as doctor from "@fe-doctor/core";
+import { getIdentifierName } from "@fe-doctor/core";
 import * as ts from "typescript";
 import { extractCodeToFunction, factory } from "./to-function";
 
@@ -44,9 +45,15 @@ export const toCurrentModule = async () => {
         caller = factory.createAwaitExpression(caller);
       }
 
+      const identifiersShouldReturnSet: Set<string> = new Set();
       const identifiersShouldReturn: ts.Identifier[] = [];
+
       for (let identifier of identifierReferedByOuterScope) {
-        identifiersShouldReturn.push(identifier.sourceNode as ts.Identifier);
+        const identifierName = getIdentifierName(identifier);
+        if (!identifiersShouldReturnSet.has(identifierName)) {
+          identifiersShouldReturnSet.add(identifierName);
+          identifiersShouldReturn.push(identifier.sourceNode as ts.Identifier);
+        }
       }
       for (let identifierName of identifiersReassigned) {
         const identifier = ts.factory.createIdentifier(identifierName);
@@ -79,16 +86,12 @@ export const toCurrentModule = async () => {
             )
           );
         } else {
-          for (let identifier of identifierReferedByOuterScope) {
+          for (let identifier of identifiersShouldReturn) {
             newStatements.push(
               factory.createVariableStatement(
                 undefined,
                 factory.createVariableDeclarationList(
-                  [
-                    factory.createVariableDeclaration(
-                      identifier.sourceNode as ts.Identifier
-                    ),
-                  ],
+                  [factory.createVariableDeclaration(identifier)],
                   ts.NodeFlags.Let
                 )
               )
