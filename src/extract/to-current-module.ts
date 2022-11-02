@@ -87,15 +87,17 @@ export const toCurrentModule = async () => {
           );
         } else {
           for (let identifier of identifiersShouldReturn) {
-            newStatements.push(
-              factory.createVariableStatement(
-                undefined,
-                factory.createVariableDeclarationList(
-                  [factory.createVariableDeclaration(identifier)],
-                  ts.NodeFlags.Let
+            if (!identifiersReassigned.has(identifier.escapedText as string)) {
+              newStatements.push(
+                factory.createVariableStatement(
+                  undefined,
+                  factory.createVariableDeclarationList(
+                    [factory.createVariableDeclaration(identifier)],
+                    ts.NodeFlags.Let
+                  )
                 )
-              )
-            );
+              );
+            }
           }
           newStatements.push(
             factory.createExpressionStatement(
