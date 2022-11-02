@@ -39,6 +39,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.clean.removeUnusedCodeInModule",
     runCommand(clean.removeUnusedCodeInModule)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.clean.renammeIdentifier",
+    runCommand(clean.renameIdentifierInModule)
+  );
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.generate.newFunctionComponentInFolder",
