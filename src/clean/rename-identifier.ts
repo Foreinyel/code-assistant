@@ -1,4 +1,5 @@
 import * as doctor from "@fe-doctor/core";
+import * as vscode from "vscode";
 import assert from "assert";
 import ts from "typescript";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
@@ -24,10 +25,27 @@ export const renameIdentifierInModule = async () => {
     selectedNodes,
     nodeList
   );
-  doctor.renameIdentifierInModule(
+
+  const newName = (await vscode.window.showInputBox({
+    prompt: "please input new name",
+    validateInput: (value) => {
+      if (!value) {
+        return "name required.";
+      }
+      return undefined;
+    },
+  })) as string;
+  if (!newName) {
+    return;
+  }
+  const moduleNodeList = doctor.renameIdentifierInModule(
     identifier,
-    "",
+    newName,
     new doctor.ModuleNodeList(programFile, nodeList),
     relations
+  );
+  await doctor.writeAstToFile(
+    moduleNodeList.programFile.ast!,
+    moduleNodeList.programFile.getAbsolutePath()
   );
 };

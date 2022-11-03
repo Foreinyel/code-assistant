@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
     runCommand(clean.removeUnusedCodeInModule)
   );
   vscode.commands.registerCommand(
-    "jvs-code-assistant.clean.renameIdentifier",
+    "jvs-code-assistant.clean.renameIdentifierInModule",
     runCommand(clean.renameIdentifierInModule)
   );
 
