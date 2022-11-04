@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { strict as assert } from "assert";
 import { getDocumentInfo } from "./getDocumentInfo";
+import ts from "typescript";
 export const getSelectedCodeInfo = () => {
   const {
     editor,
@@ -46,6 +47,12 @@ export const getSelectedCodeInfo = () => {
           node?.character?.start >= characterStart &&
           node.character.end <= characterEnd))
     ) {
+      if (
+        node.sons.length === 1 &&
+        node.sons[0].kind === ts.SyntaxKind.Identifier
+      ) {
+        continue;
+      }
       nodeIdsInSelectedNodes.add(node.id);
       selectedNodes.push(node);
     }
