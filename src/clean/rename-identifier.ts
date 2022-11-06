@@ -7,16 +7,16 @@ const checkSelectedIdentifierBeforeRename = (
   selectedNodes: doctor.Node[],
   nodeList: doctor.NodeList
 ) => {
-  assert.equal(selectedNodes?.length, 1, "Please select a Identifier");
+  assert.equal(selectedNodes?.length, 1, "Please select an Identifier");
   const [identifier] = selectedNodes;
   assert.equal(
     identifier.kind,
     ts.SyntaxKind.Identifier,
-    "Please select a Identifier"
+    "Please select an Identifier"
   );
   const relations = doctor.loadRelationsInModule(nodeList);
   const relationOfIdentifier = relations.findById(identifier.id);
-  assert.ok(!!relationOfIdentifier, "Please select a Identifier");
+  assert.ok(!!relationOfIdentifier, "Please select an Identifier");
   return { identifier, relations };
 };
 export const renameIdentifierInModule = async () => {
