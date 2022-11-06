@@ -18,6 +18,10 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### remove unused code
 
+#### reorder global statements
+
+#### rename identifier in module
+
 ### Generate
 
 #### generate new function component in folder
