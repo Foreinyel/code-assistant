@@ -20,9 +20,9 @@ const checkSelectedIdentifierBeforeRename = (
   return { identifier, relations };
 };
 export const renameIdentifierInModule = async () => {
-  const { selectedNodes, nodeList, programFile } = getSelectedCodeInfo();
+  const { selectedNodesValid, nodeList, programFile } = getSelectedCodeInfo();
   const { identifier, relations } = checkSelectedIdentifierBeforeRename(
-    selectedNodes,
+    selectedNodesValid,
     nodeList
   );
 

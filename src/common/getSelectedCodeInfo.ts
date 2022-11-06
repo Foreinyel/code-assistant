@@ -47,16 +47,22 @@ export const getSelectedCodeInfo = () => {
           node?.character?.start >= characterStart &&
           node.character.end <= characterEnd))
     ) {
-      if (
-        node.sons.length === 1 &&
-        node.sons[0].kind === ts.SyntaxKind.Identifier
-      ) {
-        continue;
-      }
       nodeIdsInSelectedNodes.add(node.id);
       selectedNodes.push(node);
     }
   }
+
+  const selectedNodesValid = selectedNodes.filter((node) => {
+    if (
+      node.sons.length === 1 &&
+      node.sons[0].kind === ts.SyntaxKind.Identifier &&
+      node.kind === ts.SyntaxKind.BindingElement
+    ) {
+      return false;
+    }
+    return true;
+  });
+
   return {
     nodeList,
     nodeIdsInSelectedNodes,
@@ -66,5 +72,6 @@ export const getSelectedCodeInfo = () => {
     projectName,
     selectedNodes,
     programFile,
+    selectedNodesValid,
   };
 };
