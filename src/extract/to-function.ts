@@ -123,7 +123,10 @@ const generateFunctionBody = (
   return bodyStatements;
 };
 
-export const extractCodeToFunction = async (isExpression = false) => {
+export const extractCodeToFunction = async (
+  isExpression = false,
+  isHook = false
+) => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
   const {
@@ -142,10 +145,15 @@ export const extractCodeToFunction = async (isExpression = false) => {
       if (!value) {
         return "new function name required.";
       }
+      if (isHook && !value.startsWith("use")) {
+        return "react hook must start with `use`.";
+      }
       return undefined;
     },
   })) as string;
-
+  if (!newFunctionName) {
+    return null;
+  }
   const functionParameters: ts.ParameterDeclaration[] =
     generateFunctionParameters(thisFlag, identifiersReferenceFromOuterScope);
   const argumentList: FunctionArgument[] = generateArgumentList(
