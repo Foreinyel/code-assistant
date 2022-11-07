@@ -62,7 +62,8 @@ const generateFunctionBody = (
   replaceThisWithParameter: boolean,
   identifierReferedByOuterScope: doctor.Node[],
   statements: doctor.Node[],
-  identifiersReassigned: Set<string>
+  identifiersReassigned: Set<string>,
+  isExpression: boolean
 ) => {
   if (replaceThisWithParameter) {
     for (let nodeId of nodeIdsInSelectedNodes.values()) {
@@ -79,38 +80,50 @@ const generateFunctionBody = (
     }
   }
 
-  const bodyStatements = [
-    ...statements.map((statement) => statement.sourceNode),
-  ];
-  if (identifierReferedByOuterScope.length || identifiersReassigned.size) {
-    const objectLiteralElements: ts.Identifier[] = [];
-    const objectLiteralElementsSet: Set<string> = new Set();
-    for (let identifier of identifierReferedByOuterScope) {
-      const identifierName = getIdentifierName(identifier);
-      if (!objectLiteralElementsSet.has(identifierName)) {
-        objectLiteralElementsSet.add(identifierName);
-        objectLiteralElements.push(ts.factory.createIdentifier(identifierName));
-      }
-    }
-    for (let name of identifiersReassigned) {
-      objectLiteralElements.push(ts.factory.createIdentifier(name));
-    }
+  let bodyStatements: ts.Statement[] = [];
+  if (isExpression) {
+    const [statement] = statements;
     const returnStatement = factory.createReturnStatement(
-      objectLiteralElements.length > 1
-        ? factory.createObjectLiteralExpression(
-            objectLiteralElements.map((item) =>
-              factory.createShorthandPropertyAssignment(item, undefined)
-            ),
-            false
-          )
-        : objectLiteralElements[0]
+      statement.sourceNode as ts.Expression
     );
     bodyStatements.push(returnStatement);
+  } else {
+    bodyStatements = [
+      ...statements.map((statement) => statement.sourceNode as ts.Statement),
+    ];
+    if (identifierReferedByOuterScope.length || identifiersReassigned.size) {
+      const objectLiteralElements: ts.Identifier[] = [];
+      const objectLiteralElementsSet: Set<string> = new Set();
+      for (let identifier of identifierReferedByOuterScope) {
+        const identifierName = getIdentifierName(identifier);
+        if (!objectLiteralElementsSet.has(identifierName)) {
+          objectLiteralElementsSet.add(identifierName);
+          objectLiteralElements.push(
+            ts.factory.createIdentifier(identifierName)
+          );
+        }
+      }
+      for (let name of identifiersReassigned) {
+        objectLiteralElements.push(ts.factory.createIdentifier(name));
+      }
+      const returnStatement = factory.createReturnStatement(
+        objectLiteralElements.length > 1
+          ? factory.createObjectLiteralExpression(
+              objectLiteralElements.map((item) =>
+                factory.createShorthandPropertyAssignment(item, undefined)
+              ),
+              false
+            )
+          : objectLiteralElements[0]
+      );
+      bodyStatements.push(returnStatement);
+    }
   }
-  return bodyStatements as ts.Statement[];
+
+  return bodyStatements;
 };
 
-export const extractCodeToFunction = async () => {
+export const extractCodeToFunction = async (isExpression = false) => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
   const {
@@ -121,6 +134,7 @@ export const extractCodeToFunction = async () => {
     awaitFlag,
     returnFlag,
     identifiersReassigned,
+    parent,
   } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   const newFunctionName = (await vscode.window.showInputBox({
     prompt: "please input new function name",
@@ -162,7 +176,8 @@ export const extractCodeToFunction = async () => {
                 thisFlag,
                 identifierReferedByOuterScope,
                 selectedStatements,
-                identifiersReassigned
+                identifiersReassigned,
+                isExpression
               )
             )
           )
@@ -185,6 +200,7 @@ export const extractCodeToFunction = async () => {
     returnFlag,
     fullFilename,
     identifiersReassigned,
+    parent,
   };
 };
 export const factory = ts.factory;

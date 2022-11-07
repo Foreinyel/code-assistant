@@ -1,15 +1,15 @@
 import * as doctor from "@fe-doctor/core";
 import { getIdentifierName } from "@fe-doctor/core";
+import assert from "assert";
 import * as ts from "typescript";
 import { extractCodeToFunction, factory } from "./to-function";
 
 /**
  * @description extract statements from block to current module
  */
-export const toCurrentModule = async () => {
+export const statementsToCurrentModule = async () => {
   const {
     sourceFile,
-    nodeList,
     selectedStatements,
     newFunctionName,
     argumentList,
@@ -18,12 +18,11 @@ export const toCurrentModule = async () => {
     returnFlag,
     fullFilename,
     identifiersReassigned,
-  } = await extractCodeToFunction();
+    parent,
+  } = await extractCodeToFunction(true);
 
   // 用新函数代替选择的函数体
-  const parentBlockOfSelectedNodes = nodeList.findById(
-    selectedStatements[0].parentId
-  );
+  const parentBlockOfSelectedNodes = parent;
   const newStatements = [];
   let insert = false;
   const originSelectedStatements = selectedStatements.map(
@@ -128,5 +127,29 @@ export const toCurrentModule = async () => {
     }
   }
   (parentBlockOfSelectedNodes!.sourceNode as any).statements = newStatements;
+  await doctor.writeAstToFile(sourceFile!, fullFilename);
+};
+
+export const expressionToCurrentModule = async () => {
+  const {
+    sourceFile,
+    newFunctionName,
+    argumentList,
+    awaitFlag,
+    fullFilename,
+    parent,
+  } = await extractCodeToFunction(true);
+  assert.ok((parent.sourceNode as any).expression);
+  let caller: ts.AwaitExpression | ts.CallExpression =
+    factory.createCallExpression(
+      factory.createIdentifier(newFunctionName),
+      undefined,
+      argumentList
+    );
+  if (awaitFlag) {
+    caller = factory.createAwaitExpression(caller);
+  }
+  (parent.sourceNode as any).expression =
+    ts.factory.createParenthesizedExpression(caller);
   await doctor.writeAstToFile(sourceFile!, fullFilename);
 };

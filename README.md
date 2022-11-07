@@ -12,6 +12,8 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### extract elements to component
 
+#### extract expression to current module
+
 ### Clean
 
 #### sort global statements

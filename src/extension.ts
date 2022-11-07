@@ -19,16 +19,20 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
   vscode.commands.registerCommand(
-    "jvs-code-assistant.extract.toCurrentModule",
-    runCommand(extract.toCurrentModule)
+    "jvs-code-assistant.extract.statements.toCurrentModule",
+    runCommand(extract.statementsToCurrentModule)
   );
   vscode.commands.registerCommand(
-    "jvs-code-assistant.extract.toTargetModule",
+    "jvs-code-assistant.extract.statement.toTargetModule",
     runCommand(extract.toTargetModule)
   );
   vscode.commands.registerCommand(
-    "jvs-code-assistant.extract.toComponent",
+    "jvs-code-assistant.extract.elements.toComponent",
     runCommand(extract.toComponent)
+  );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.expression.toCurrentModule",
+    runCommand(extract.expressionToCurrentModule)
   );
 
   vscode.commands.registerCommand(
