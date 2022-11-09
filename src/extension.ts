@@ -27,6 +27,10 @@ export function activate(context: vscode.ExtensionContext) {
     runCommand(extract.toTargetModule)
   );
   vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.statement.toNewModule",
+    runCommand(extract.toNewModule)
+  );
+  vscode.commands.registerCommand(
     "jvs-code-assistant.extract.elements.toComponent",
     runCommand(extract.toComponent)
   );

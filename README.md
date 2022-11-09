@@ -10,6 +10,8 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### extract statement to target module
 
+#### extract statement to new module
+
 #### extract elements to component
 
 #### extract expression to current module

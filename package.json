@@ -1,1 +1,122 @@
-{"name":"jvs-code-assistant","displayName":"jvs-code-assistant","description":"","version":"0.5.1","engines":{"vscode":"^1.69.0"},"icon":"res/logo.png","categories":["Other"],"activationEvents":["onCommand:jvs-code-assistant.extract.statements.toCurrentModule","onCommand:jvs-code-assistant.extract.statement.toTargetModule","onCommand:jvs-code-assistant.extract.elements.toComponent","onCommand:jvs-code-assistant.extract.expression.toCurrentModule","onCommand:jvs-code-assistant.clean.reorderGlobalStatements","onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule","onCommand:jvs-code-assistant.clean.renameIdentifierInModule","onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder","onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"],"main":"./bundle/main.js","contributes":{"commands":[{"command":"jvs-code-assistant.extract.statements.toCurrentModule","title":"Extract Statements To Current Module"},{"command":"jvs-code-assistant.extract.statement.toTargetModule","title":"Extract Statement To Target Module"},{"command":"jvs-code-assistant.extract.elements.toComponent","title":"Extract Elements To Component"},{"command":"jvs-code-assistant.extract.expression.toCurrentModule","title":"Extract expression To Current Module"},{"command":"jvs-code-assistant.clean.reorderGlobalStatements","title":"Clean By Re-Order Global Statements"},{"command":"jvs-code-assistant.clean.removeUnusedCodeInModule","title":"Clean By Remove Unused Code In Module"},{"command":"jvs-code-assistant.clean.renameIdentifierInModule","title":"Clean By Re-Name Identifier In Module"},{"command":"jvs-code-assistant.generate.newFunctionComponentInFolder","title":"Generate New Function Component In Folder"},{"command":"jvs-code-assistant.generate.newFunctionComponentInModule","title":"Generate New Function Component In Module"}],"configuration":{"title":"jvs code assistant","properties":{"jvs-code-assistant.src":{"type":"string","default":".","description":"path of source folder relatived from root path."},"jvs-code-assistant.excludes":{"type":"array","default":[".git",".umi","res"],"description":"relative paths which are not source folders should be excluded."}}}},"scripts":{"compile":"tsc -p ./","watch":"node env.js dev && tsc -watch -p ./","pretest":"npm run compile && npm run lint","lint":"eslint src --ext ts","test":"node ./out/test/runTest.js","pack":"node env.js prod && vsce package --out=dist --no-yarn","vscode:prepublish":"npm run esbuild-base -- --minify","esbuild-base":"esbuild ./src/extension.ts --bundle --outfile=bundle/main.js --external:vscode --format=cjs --platform=node","esbuild":"npm run esbuild-base -- --sourcemap","esbuild-watch":"npm run esbuild-base -- --sourcemap --watch","test-compile":"tsc -p ./"},"devDependencies":{"@types/glob":"^7.2.0","@types/mocha":"^9.1.1","@types/node":"16.x","@types/vscode":"^1.69.0","@typescript-eslint/eslint-plugin":"^5.30.0","@typescript-eslint/parser":"^5.30.0","@vscode/test-electron":"^2.1.5","esbuild":"^0.15.9","eslint":"^8.18.0","glob":"^8.0.3","mocha":"^10.0.0"},"dependencies":{"@fe-doctor/core":"^0.2.1","@hemyn/utils-node":"^0.4.3","typescript":"^4.7.4"},"publisher":"Foreinyel","repository":"https://github.com/Foreinyel/code-assistant"}
+{
+  "name": "jvs-code-assistant",
+  "displayName": "jvs-code-assistant",
+  "description": "",
+  "version": "0.5.1",
+  "engines": {
+    "vscode": "^1.69.0"
+  },
+  "icon": "res/logo.png",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:jvs-code-assistant.extract.statements.toCurrentModule",
+    "onCommand:jvs-code-assistant.extract.statement.toTargetModule",
+    "onCommand:jvs-code-assistant.extract.statement.toNewModule",
+    "onCommand:jvs-code-assistant.extract.elements.toComponent",
+    "onCommand:jvs-code-assistant.extract.expression.toCurrentModule",
+    "onCommand:jvs-code-assistant.clean.reorderGlobalStatements",
+    "onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule",
+    "onCommand:jvs-code-assistant.clean.renameIdentifierInModule",
+    "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
+    "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "jvs-code-assistant.extract.statements.toCurrentModule",
+        "title": "jvs - Extract Statements To Current Module"
+      },
+      {
+        "command": "jvs-code-assistant.extract.statement.toTargetModule",
+        "title": "jvs - Extract Statement To Target Module"
+      },
+      {
+        "command": "jvs-code-assistant.extract.statement.toNewModule",
+        "title": "jvs - Extract Statement To New Module"
+      },
+      {
+        "command": "jvs-code-assistant.extract.elements.toComponent",
+        "title": "jvs - Extract Elements To Component"
+      },
+      {
+        "command": "jvs-code-assistant.extract.expression.toCurrentModule",
+        "title": "jvs - Extract expression To Current Module"
+      },
+      {
+        "command": "jvs-code-assistant.clean.reorderGlobalStatements",
+        "title": "jvs - Clean By Re-Order Global Statements"
+      },
+      {
+        "command": "jvs-code-assistant.clean.removeUnusedCodeInModule",
+        "title": "jvs - Clean By Remove Unused Code In Module"
+      },
+      {
+        "command": "jvs-code-assistant.clean.renameIdentifierInModule",
+        "title": "jvs - Clean By Re-Name Identifier In Module"
+      },
+      {
+        "command": "jvs-code-assistant.generate.newFunctionComponentInFolder",
+        "title": "jvs - Generate New Function Component In Folder"
+      },
+      {
+        "command": "jvs-code-assistant.generate.newFunctionComponentInModule",
+        "title": "jvs - Generate New Function Component In Module"
+      }
+    ],
+    "configuration": {
+      "title": "jvs code assistant",
+      "properties": {
+        "jvs-code-assistant.src": {
+          "type": "string",
+          "default": ".",
+          "description": "path of source folder relatived from root path."
+        },
+        "jvs-code-assistant.excludes": {
+          "type": "array",
+          "default": [
+            ".git",
+            ".umi",
+            "res"
+          ],
+          "description": "relative paths which are not source folders should be excluded."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "node env.js dev && tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "pack": "node env.js prod && vsce package --out=dist --no-yarn",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=bundle/main.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "test-compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.69.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "@vscode/test-electron": "^2.1.5",
+    "esbuild": "^0.15.9",
+    "eslint": "^8.18.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "@fe-doctor/core": "^0.2.1",
+    "@hemyn/utils-node": "^0.4.3",
+    "typescript": "^4.7.4"
+  },
+  "publisher": "Foreinyel",
+  "repository": "https://github.com/Foreinyel/code-assistant"
+}
