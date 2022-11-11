@@ -20,12 +20,12 @@ export const getSelectedCodeInfo = () => {
   const [selection] = selections;
   const { line: lineStart, character: characterStart } = selection.start;
   const { line: lineEnd, character: characterEnd } = selection.end;
-  const selectedText = document.getText(
-    new vscode.Range(
-      new vscode.Position(selection.start.line, 0),
-      new vscode.Position(selection.end.line + 1, 0)
-    )
-  );
+  // const selectedText = document.getText(
+  //   new vscode.Range(
+  //     new vscode.Position(selection.start.line, 0),
+  //     new vscode.Position(selection.end.line + 1, 0)
+  //   )
+  // );
   const nodeIdsInSelectedNodes: Set<number> = new Set();
   const selectedNodes: doctor.Node[] = [];
   for (let node of nodeList) {
@@ -37,10 +37,20 @@ export const getSelectedCodeInfo = () => {
       ((node?.line?.start > lineStart && node?.line?.end < lineEnd) ||
         (lineStart !== lineEnd &&
           node?.line?.start === lineStart &&
-          node?.character?.start >= characterStart) ||
+          node?.character?.start >= characterStart &&
+          (node?.line?.end === lineEnd
+            ? node?.character?.end <= characterEnd
+            : node?.line?.end > lineEnd
+            ? false
+            : true)) ||
         (lineStart !== lineEnd &&
           node?.line?.end === lineEnd &&
-          node.character.end <= characterEnd) ||
+          node.character.end <= characterEnd &&
+          (node?.line?.start === lineStart
+            ? node?.character.start >= characterStart
+            : node?.line?.start < lineStart
+            ? false
+            : true)) ||
         (lineStart === lineEnd &&
           node?.line?.start === lineStart &&
           node?.line?.end === lineEnd &&
