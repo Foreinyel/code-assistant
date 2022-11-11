@@ -16,6 +16,7 @@
     "onCommand:jvs-code-assistant.extract.statement.toNewModule",
     "onCommand:jvs-code-assistant.extract.elements.toComponent",
     "onCommand:jvs-code-assistant.extract.expression.toCurrentModule",
+    "onCommand:jvs-code-assistant.extract.constant.toCurrentModule",
     "onCommand:jvs-code-assistant.clean.reorderGlobalStatements",
     "onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule",
     "onCommand:jvs-code-assistant.clean.renameIdentifierInModule",
@@ -44,6 +45,10 @@
       {
         "command": "jvs-code-assistant.extract.expression.toCurrentModule",
         "title": "jvs - Extract expression To Current Module"
+      },
+      {
+        "command": "jvs-code-assistant.extract.constant.toCurrentModule",
+        "title": "jvs - Extract constant To Current Module"
       },
       {
         "command": "jvs-code-assistant.clean.reorderGlobalStatements",

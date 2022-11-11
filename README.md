@@ -16,6 +16,8 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### extract expression to current module
 
+#### extract constant to current module
+
 ### Clean
 
 #### sort global statements

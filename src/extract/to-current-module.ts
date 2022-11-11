@@ -2,6 +2,8 @@ import * as doctor from "@fe-doctor/core";
 import { getIdentifierName } from "@fe-doctor/core";
 import assert from "assert";
 import * as ts from "typescript";
+import * as vscode from "vscode";
+import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
 import { extractCodeToFunction, factory } from "./to-function";
 
 /**
@@ -162,4 +164,55 @@ export const expressionToCurrentModule = async () => {
       ts.factory.createParenthesizedExpression(caller);
     await doctor.writeAstToFile(sourceFile!, fullFilename);
   }
+};
+
+export const constantToCurrentModule = async () => {
+  const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
+    getSelectedCodeInfo();
+  const {
+    selectedStatements,
+    identifierReferedByOuterScope,
+    identifiersReferenceFromOuterScope,
+    parent,
+  } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
+  assert.ok(selectedStatements.length === 1);
+  assert.ok(!identifierReferedByOuterScope.length);
+  assert.ok(!identifiersReferenceFromOuterScope.length);
+  const newVariableName = (await vscode.window.showInputBox({
+    prompt: "please input variable name",
+    validateInput: (value) => {
+      if (!value) {
+        return "variable name required.";
+      }
+      return undefined;
+    },
+  })) as string;
+  if (!newVariableName) {
+    return;
+  }
+  const newVariableStatement = ts.factory.createVariableStatement(
+    undefined,
+    ts.factory.createVariableDeclarationList(
+      [
+        ts.factory.createVariableDeclaration(
+          newVariableName,
+          undefined,
+          undefined,
+          selectedStatements[0].sourceNode as any
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+  const parentSourceNode = parent.sourceNode as any;
+  if (parentSourceNode.expression) {
+    parentSourceNode.expression = ts.factory.createIdentifier(newVariableName);
+  } else if (parentSourceNode.right) {
+    parentSourceNode.right = ts.factory.createIdentifier(newVariableName);
+  }
+  (sourceFile as any).statements = [
+    ...(sourceFile as any).statements,
+    newVariableStatement,
+  ];
+  await doctor.writeAstToFile(sourceFile!, fullFilename);
 };
