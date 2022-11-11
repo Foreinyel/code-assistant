@@ -22,7 +22,7 @@
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
-  "main": "./out/extension.js",
+  "main": "./bundle/main.js",
   "contributes": {
     "commands": [
       {
@@ -113,7 +113,7 @@
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@fe-doctor/core": "^0.2.2",
+    "@fe-doctor/core": "^0.2.6",
     "@hemyn/utils-node": "^0.4.3",
     "typescript": "^4.7.4"
   },
