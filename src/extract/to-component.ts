@@ -9,8 +9,11 @@ const factory = ts.factory;
 export const toComponent = async () => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
-  const { selectedStatements, identifiersReferenceFromOuterScope, thisFlag } =
-    doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
+  const {
+    selectedStatements,
+    identifiersReferenceFromOuterScope,
+    propertyAccessChains,
+  } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   const newFunctionName = (await vscode.window.showInputBox({
     prompt: "please input component name",
     validateInput: (value) => {
@@ -24,6 +27,7 @@ export const toComponent = async () => {
     return;
   }
   const membersOfThis: Set<string> = new Set();
+  const propertiesOfProps: Set<string> = new Set();
   for (let nodeId of nodeIdsInSelectedNodes.values()) {
     const node = nodeList.findById(nodeId);
     if (
@@ -37,6 +41,16 @@ export const toComponent = async () => {
       );
       (node.sourceNode as any).expression =
         ts.factory.createIdentifier("props");
+    } else if (
+      node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
+      ((node.sourceNode as ts.PropertyAccessExpression).expression as any)
+        .escapedText === "props"
+    ) {
+      propertiesOfProps.add(
+        (node.sourceNode as ts.PropertyAccessExpression).name
+          .escapedText as string
+      );
+      // todo replace props.property with property
     }
   }
   const { interfaceOfProps, component, componentName } =
