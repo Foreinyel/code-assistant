@@ -150,7 +150,6 @@ export const expressionToCurrentModule = async () => {
       fullFilename,
       parent,
     } = result;
-    assert.ok((parent.sourceNode as any).expression);
     let caller: ts.AwaitExpression | ts.CallExpression =
       factory.createCallExpression(
         factory.createIdentifier(newFunctionName),
@@ -160,8 +159,16 @@ export const expressionToCurrentModule = async () => {
     if (awaitFlag) {
       caller = factory.createAwaitExpression(caller);
     }
-    (parent.sourceNode as any).expression =
-      ts.factory.createParenthesizedExpression(caller);
+    if ((parent.sourceNode as any).body) {
+      (parent.sourceNode as any).body =
+        ts.factory.createParenthesizedExpression(caller);
+    } else if ((parent.sourceNode as any).expression) {
+      (parent.sourceNode as any).expression =
+        ts.factory.createParenthesizedExpression(caller);
+    } else {
+      throw new Error("Unhandled parent kind.");
+    }
+
     await doctor.writeAstToFile(sourceFile!, fullFilename);
   }
 };

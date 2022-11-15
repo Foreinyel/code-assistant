@@ -10,7 +10,7 @@ export const toComponent = async () => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
   const { selectedStatements, identifiersReferenceFromOuterScope, thisFlag } =
-    doctor.findReferredIdentifiersOfNodeList(nodeList, nodeIdsInSelectedNodes);
+    doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   const newFunctionName = (await vscode.window.showInputBox({
     prompt: "please input component name",
     validateInput: (value) => {
@@ -20,6 +20,9 @@ export const toComponent = async () => {
       return undefined;
     },
   })) as string;
+  if (!newFunctionName) {
+    return;
+  }
   const membersOfThis: Set<string> = new Set();
   for (let nodeId of nodeIdsInSelectedNodes.values()) {
     const node = nodeList.findById(nodeId);
