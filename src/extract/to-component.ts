@@ -2,6 +2,101 @@ import * as ts from "typescript";
 import * as vscode from "vscode";
 import * as doctor from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
+const checkIfAccessingThis = (node: any) => {
+  return (
+    node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
+    (node.sourceNode as ts.PropertyAccessExpression).expression.kind ===
+      ts.SyntaxKind.ThisKeyword
+  );
+};
+const checkIfAccessingThisProps = (node: any) => {
+  return (
+    (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
+    "props"
+  );
+};
+const addMembersOfThisAndConvertThisProps = (membersOfThis: any, node: any) => {
+  membersOfThis.add(
+    `props.${
+      (node.father!.sourceNode as ts.PropertyAccessExpression).name
+        .escapedText as string
+    }`
+  );
+  if (
+    ((node.father?.sourceNode as any)?.expression === node.sourceNode &&
+      (node.father?.father?.sourceNode as any)?.expression) ===
+    node.father?.sourceNode
+  ) {
+    (node.father!.father!.sourceNode as any).expression = (
+      node.father!.sourceNode as any
+    )?.name;
+  }
+};
+const checkIfAccessingThisState = (node: any) => {
+  return (
+    (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
+    "state"
+  );
+};
+const addMembersOfThisAndConvertThisState = (membersOfThis: any, node: any) => {
+  membersOfThis.add(
+    `state.${
+      (node.father!.sourceNode as ts.PropertyAccessExpression).name
+        .escapedText as string
+    }`
+  );
+  (node.father!.sourceNode as any).expression =
+    ts.factory.createIdentifier("props");
+};
+const addMembersOfThisAndConvertThis = (membersOfThis: any, node: any) => {
+  membersOfThis.add(
+    (node.sourceNode as ts.PropertyAccessExpression).name.escapedText as string
+  );
+  (node.sourceNode as any).expression = ts.factory.createIdentifier("props");
+};
+const checkIfAccessingProps = (node: any) => {
+  return (
+    node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
+    ((node.sourceNode as ts.PropertyAccessExpression).expression as any)
+      ?.escapedText === "props"
+  );
+};
+const addPropertiesOfPropsAndConvertProps = (
+  propertiesOfProps: any,
+  node: any
+) => {
+  propertiesOfProps.add(
+    (node.sourceNode as ts.PropertyAccessExpression).name.escapedText as string
+  );
+  // todo replace props.property with property
+  if ((node.father?.sourceNode as any)?.expression === node.sourceNode) {
+    (node.father!.sourceNode as any).expression = (
+      node.sourceNode as any
+    )?.name;
+  }
+};
+const initializeMembersOfThisAndPropertiesOfProps = (
+  nodeIdsInSelectedNodes: any,
+  nodeList: any
+) => {
+  const membersOfThis: Set<string> = new Set();
+  const propertiesOfProps: Set<string> = new Set();
+  for (let nodeId of nodeIdsInSelectedNodes.values()) {
+    const node = nodeList.findById(nodeId);
+    if (checkIfAccessingThis(node)) {
+      if (checkIfAccessingThisProps(node)) {
+        addMembersOfThisAndConvertThisProps(membersOfThis, node);
+      } else if (checkIfAccessingThisState(node)) {
+        addMembersOfThisAndConvertThisState(membersOfThis, node);
+      } else {
+        addMembersOfThisAndConvertThis(membersOfThis, node);
+      }
+    } else if (checkIfAccessingProps(node)) {
+      addPropertiesOfPropsAndConvertProps(propertiesOfProps, node);
+    }
+  }
+  return { membersOfThis, propertiesOfProps };
+};
 const factory = ts.factory;
 /**
  * @description 提取element到独立组件
@@ -23,71 +118,11 @@ export const toComponent = async () => {
   if (!newFunctionName) {
     return;
   }
-  const membersOfThis: Set<string> = new Set();
-  const propertiesOfProps: Set<string> = new Set();
-  for (let nodeId of nodeIdsInSelectedNodes.values()) {
-    const node = nodeList.findById(nodeId);
-    if (
-      node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
-      (node.sourceNode as ts.PropertyAccessExpression).expression.kind ===
-        ts.SyntaxKind.ThisKeyword
-    ) {
-      if (
-        (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
-        "props"
-      ) {
-        membersOfThis.add(
-          `props.${
-            (node.father!.sourceNode as ts.PropertyAccessExpression).name
-              .escapedText as string
-          }`
-        );
-        if (
-          ((node.father?.sourceNode as any)?.expression === node.sourceNode &&
-            (node.father?.father?.sourceNode as any)?.expression) ===
-          node.father?.sourceNode
-        ) {
-          (node.father!.father!.sourceNode as any).expression = (
-            node.father!.sourceNode as any
-          )?.name;
-        }
-      } else if (
-        (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
-        "state"
-      ) {
-        membersOfThis.add(
-          `state.${
-            (node.father!.sourceNode as ts.PropertyAccessExpression).name
-              .escapedText as string
-          }`
-        );
-        (node.father!.sourceNode as any).expression =
-          ts.factory.createIdentifier("props");
-      } else {
-        membersOfThis.add(
-          (node.sourceNode as ts.PropertyAccessExpression).name
-            .escapedText as string
-        );
-        (node.sourceNode as any).expression =
-          ts.factory.createIdentifier("props");
-      }
-    } else if (
-      node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
-      ((node.sourceNode as ts.PropertyAccessExpression).expression as any)
-        ?.escapedText === "props"
-    ) {
-      propertiesOfProps.add(
-        (node.sourceNode as ts.PropertyAccessExpression).name
-          .escapedText as string
-      );
-      // todo replace props.property with property
-      if ((node.father?.sourceNode as any)?.expression === node.sourceNode) {
-        (node.father!.sourceNode as any).expression = (
-          node.sourceNode as any
-        )?.name;
-      }
-    }
-  }
+  const { membersOfThis, propertiesOfProps } =
+    initializeMembersOfThisAndPropertiesOfProps(
+      nodeIdsInSelectedNodes,
+      nodeList
+    );
   const { interfaceOfProps, component, componentName } =
     doctor.generateFunctionComponent(
       newFunctionName,

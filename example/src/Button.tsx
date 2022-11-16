@@ -12,9 +12,22 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = (props) => {
   const [count, setCount] = React.useState(0);
   return (
     <div>
+      <Dddd count={count} setCount={setCount} onClick={props.onClick} />
+    </div>
+  );
+};
+interface DdddProps {
+  count: any;
+  setCount: any;
+  onClick: any;
+}
+const Dddd: React.FC<DdddProps> = (props) => {
+  const { count, setCount, onClick } = props;
+  return (
+    <>
       <div>{count}</div>
       <div onClick={() => setCount(count + 1)}>dianji</div>
-      <div>{props.onClick}</div>
-    </div>
+      <div>{onClick}</div>
+    </>
   );
 };
