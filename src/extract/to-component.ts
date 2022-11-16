@@ -9,11 +9,8 @@ const factory = ts.factory;
 export const toComponent = async () => {
   const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
     getSelectedCodeInfo();
-  const {
-    selectedStatements,
-    identifiersReferenceFromOuterScope,
-    propertyAccessChains,
-  } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
+  const { selectedStatements, identifiersReferenceFromOuterScope } =
+    doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   const newFunctionName = (await vscode.window.showInputBox({
     prompt: "please input component name",
     validateInput: (value) => {
@@ -35,22 +32,60 @@ export const toComponent = async () => {
       (node.sourceNode as ts.PropertyAccessExpression).expression.kind ===
         ts.SyntaxKind.ThisKeyword
     ) {
-      membersOfThis.add(
-        (node.sourceNode as ts.PropertyAccessExpression).name
-          .escapedText as string
-      );
-      (node.sourceNode as any).expression =
-        ts.factory.createIdentifier("props");
+      if (
+        (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
+        "props"
+      ) {
+        membersOfThis.add(
+          `props.${
+            (node.father!.sourceNode as ts.PropertyAccessExpression).name
+              .escapedText as string
+          }`
+        );
+        if (
+          ((node.father?.sourceNode as any)?.expression === node.sourceNode &&
+            (node.father?.father?.sourceNode as any)?.expression) ===
+          node.father?.sourceNode
+        ) {
+          (node.father!.father!.sourceNode as any).expression = (
+            node.father!.sourceNode as any
+          )?.name;
+        }
+      } else if (
+        (node.sourceNode as ts.PropertyAccessExpression).name.escapedText ===
+        "state"
+      ) {
+        membersOfThis.add(
+          `state.${
+            (node.father!.sourceNode as ts.PropertyAccessExpression).name
+              .escapedText as string
+          }`
+        );
+        (node.father!.sourceNode as any).expression =
+          ts.factory.createIdentifier("props");
+      } else {
+        membersOfThis.add(
+          (node.sourceNode as ts.PropertyAccessExpression).name
+            .escapedText as string
+        );
+        (node.sourceNode as any).expression =
+          ts.factory.createIdentifier("props");
+      }
     } else if (
       node?.kind === ts.SyntaxKind.PropertyAccessExpression &&
       ((node.sourceNode as ts.PropertyAccessExpression).expression as any)
-        .escapedText === "props"
+        ?.escapedText === "props"
     ) {
       propertiesOfProps.add(
         (node.sourceNode as ts.PropertyAccessExpression).name
           .escapedText as string
       );
       // todo replace props.property with property
+      if ((node.father?.sourceNode as any)?.expression === node.sourceNode) {
+        (node.father!.sourceNode as any).expression = (
+          node.sourceNode as any
+        )?.name;
+      }
     }
   }
   const { interfaceOfProps, component, componentName } =
@@ -58,10 +93,29 @@ export const toComponent = async () => {
       newFunctionName,
       false,
       [
-        ...identifiersReferenceFromOuterScope.map(
-          (item) => (item.sourceNode as ts.Identifier).escapedText as string
-        ),
-        ...Array.from(membersOfThis),
+        ...identifiersReferenceFromOuterScope
+          .filter(
+            (item) =>
+              ((item.sourceNode as ts.Identifier).escapedText as string) !==
+              "props"
+          )
+          .map(
+            (item) => (item.sourceNode as ts.Identifier).escapedText as string
+          ),
+        ...Array.from(membersOfThis).map((item) => {
+          if (item.indexOf(".") >= 0) {
+            const properties = item.split(".");
+            return properties[properties.length - 1];
+          }
+          return item;
+        }),
+        ...Array.from(propertiesOfProps).map((item) => {
+          if (item.indexOf(".") >= 0) {
+            const properties = item.split(".");
+            return properties[properties.length - 1];
+          }
+          return item;
+        }),
       ],
       selectedStatements.filter((item) => {
         if (
@@ -82,26 +136,52 @@ export const toComponent = async () => {
     factory.createIdentifier(componentName),
     undefined,
     factory.createJsxAttributes([
-      ...identifiersReferenceFromOuterScope.map((item) =>
-        factory.createJsxAttribute(
-          factory.createIdentifier(
-            (item.sourceNode as ts.Identifier).escapedText as string
-          ),
-          factory.createJsxExpression(
-            undefined,
+      ...identifiersReferenceFromOuterScope
+        .filter(
+          (item) =>
+            ((item.sourceNode as ts.Identifier).escapedText as string) !==
+            "props"
+        )
+        .map((item) =>
+          factory.createJsxAttribute(
             factory.createIdentifier(
               (item.sourceNode as ts.Identifier).escapedText as string
+            ),
+            factory.createJsxExpression(
+              undefined,
+              factory.createIdentifier(
+                (item.sourceNode as ts.Identifier).escapedText as string
+              )
             )
           )
-        )
-      ),
+        ),
       ...Array.from(membersOfThis).map((item) => {
+        let attributeName = item;
+        if (item.indexOf(".") >= 0) {
+          attributeName = item.split(".")[item.split(".").length - 1];
+        }
         return factory.createJsxAttribute(
-          factory.createIdentifier(item),
+          factory.createIdentifier(attributeName),
           factory.createJsxExpression(
             undefined,
             factory.createPropertyAccessExpression(
               factory.createThis(),
+              factory.createIdentifier(item)
+            )
+          )
+        );
+      }),
+      ...Array.from(propertiesOfProps).map((item) => {
+        let attributeName = item;
+        if (item.indexOf(".") >= 0) {
+          attributeName = item.split(".")[item.split(".").length - 1];
+        }
+        return factory.createJsxAttribute(
+          factory.createIdentifier(attributeName),
+          factory.createJsxExpression(
+            undefined,
+            factory.createPropertyAccessExpression(
+              factory.createIdentifier("props"),
               factory.createIdentifier(item)
             )
           )

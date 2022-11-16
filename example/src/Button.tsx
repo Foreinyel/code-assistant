@@ -9,5 +9,12 @@ const Link: React.FC<LinkProps> = (props) => {
   return <div />;
 };
 const PrimaryButton: React.FC<PrimaryButtonProps> = (props) => {
-  return <div />;
+  const [count, setCount] = React.useState(0);
+  return (
+    <div>
+      <div>{count}</div>
+      <div onClick={() => setCount(count + 1)}>dianji</div>
+      <div>{props.onClick}</div>
+    </div>
+  );
 };
