@@ -12,7 +12,7 @@ const main = () => {
   }
   fs.writeFileSync(
     path.resolve(__dirname, "./package.json"),
-    JSON.stringify(pkgJson)
+    JSON.stringify(pkgJson, undefined, 2)
   );
 };
 

@@ -149,6 +149,7 @@ export const expressionToCurrentModule = async () => {
       awaitFlag,
       fullFilename,
       parent,
+      selectedStatements,
     } = result;
     let caller: ts.AwaitExpression | ts.CallExpression =
       factory.createCallExpression(
@@ -165,6 +166,15 @@ export const expressionToCurrentModule = async () => {
     } else if ((parent.sourceNode as any).expression) {
       (parent.sourceNode as any).expression =
         ts.factory.createParenthesizedExpression(caller);
+    } else if (parent.kind === ts.SyntaxKind.BinaryExpression) {
+      const [statement] = selectedStatements;
+      if ((parent as any).sourceNode.left === statement.sourceNode) {
+        (parent.sourceNode as any).left =
+          ts.factory.createParenthesizedExpression(caller);
+      } else if ((parent as any).sourceNode.right === statement.sourceNode) {
+        (parent.sourceNode as any).right =
+          ts.factory.createParenthesizedExpression(caller);
+      }
     } else {
       throw new Error("Unhandled parent kind.");
     }
