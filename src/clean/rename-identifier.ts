@@ -15,8 +15,8 @@ const checkSelectedIdentifierBeforeRename = (
     "Please select an Identifier"
   );
   const relations = doctor.loadRelationsInModule(nodeList);
-  const relationOfIdentifier = relations.findById(identifier.id);
-  assert.ok(!!relationOfIdentifier, "Please select an Identifier");
+  // const relationOfIdentifier = relations.findById(identifier.id);
+  // assert.ok(!!relationOfIdentifier, "Please select an Identifier");
   return { identifier, relations };
 };
 export const renameIdentifierInModule = async () => {
