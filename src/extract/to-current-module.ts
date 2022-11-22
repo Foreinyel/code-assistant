@@ -222,7 +222,23 @@ export const constantToCurrentModule = async () => {
     )
   );
   const parentSourceNode = parent.sourceNode as any;
-  if (parentSourceNode.expression) {
+  if (
+    parentSourceNode.arguments?.find(
+      (arg: any) => arg === selectedStatements[0].sourceNode
+    )
+  ) {
+    parentSourceNode.arguments.splice(
+      parentSourceNode.arguments?.findIndex(
+        (arg: any) => arg === selectedStatements[0].sourceNode
+      ),
+      1,
+      ts.factory.createIdentifier(newVariableName)
+    );
+  } else if (
+    parentSourceNode.initializer === selectedStatements[0].sourceNode
+  ) {
+    parentSourceNode.initializer = ts.factory.createIdentifier(newVariableName);
+  } else if (parentSourceNode.expression) {
     parentSourceNode.expression = ts.factory.createIdentifier(newVariableName);
   } else if (parentSourceNode.right) {
     parentSourceNode.right = ts.factory.createIdentifier(newVariableName);
