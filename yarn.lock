@@ -48,10 +48,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fe-doctor/core@0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@fe-doctor/core/-/core-0.1.5.tgz#9052c37d9d5122d2c855347b24de2d4fe7a548ef"
-  integrity sha512-Q8MyloR7OMrUH6HbRPu6eoNt99FbaH6f/hkPuIFsEO+UzAZc6X9onLHVFL1sBgs1cSzIsvkFThlqlcTpeCvWSg==
+"@fe-doctor/core@0.2.11":
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/@fe-doctor/core/-/core-0.2.11.tgz#a9033bbf40be658544d73e51cb773df40d4a8662"
+  integrity sha512-PGqevA/0fhAqpW6SVW2gNRGlLen+3ahDTYYzpIGz7G/XSV23YuYdy3mUbaRCwtHuczyXYM/SG8Y5ZV+Qwfrjww==
   dependencies:
     cosmiconfig "^7.0.0"
     iconv-lite "^0.6.3"
