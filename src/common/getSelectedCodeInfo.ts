@@ -65,20 +65,8 @@ const checkIfNodeSelected = (
 ) => {
   return (
     checkIfNodeInInnerLines(node, lineStart, lineEnd) ||
-    checkIfNodeStartFromFirstLine(
-      lineStart,
-      lineEnd,
-      node,
-      characterStart,
-      characterEnd
-    ) ||
-    checkIfNodeEndToLastLine(
-      lineStart,
-      lineEnd,
-      node,
-      characterEnd,
-      characterStart
-    ) ||
+    checkIfNodeStartFromFirstLine(lineStart, lineEnd, node, characterStart, characterEnd) ||
+    checkIfNodeEndToLastLine(lineStart, lineEnd, node, characterEnd, characterStart) ||
     checkIfNodeInOneLine(lineStart, lineEnd, node, characterStart, characterEnd)
   );
 };
@@ -86,20 +74,12 @@ const checkIfParentAndChildrenSameRange = (node: any) => {
   return (
     node.sons.length === 1 &&
     node.sons[0].kind === ts.SyntaxKind.Identifier &&
-    node.kind === ts.SyntaxKind.BindingElement
+    [ts.SyntaxKind.BindingElement, ts.SyntaxKind.ShorthandPropertyAssignment].includes(node.kind)
   );
 };
 export const getSelectedCodeInfo = () => {
-  const {
-    editor,
-    document,
-    nodeList,
-    sourceFile,
-    fullFilename,
-    rootPath,
-    projectName,
-    programFile,
-  } = getDocumentInfo();
+  const { editor, document, nodeList, sourceFile, fullFilename, rootPath, projectName, programFile } =
+    getDocumentInfo();
   // todo: validate if it's right code block, extracted code must be in one big block
   const { selections } = editor;
   assert.ok(selections.length === 1 && !!document, "invalid selections");
@@ -120,13 +100,7 @@ export const getSelectedCodeInfo = () => {
       typeof node?.line?.end === "number" &&
       typeof node?.character?.start === "number" &&
       typeof node?.character?.end === "number" &&
-      checkIfNodeSelected(
-        node,
-        lineStart,
-        lineEnd,
-        characterStart,
-        characterEnd
-      )
+      checkIfNodeSelected(node, lineStart, lineEnd, characterStart, characterEnd)
     ) {
       nodeIdsInSelectedNodes.add(node.id);
       selectedNodes.push(node);

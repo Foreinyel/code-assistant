@@ -23,7 +23,7 @@
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
-  "main": "./bundle/main.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
