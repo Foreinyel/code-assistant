@@ -29,21 +29,17 @@ export const statementsToCurrentModule = async () => {
     const parentBlockOfSelectedNodes = parent;
     const newStatements = [];
     let insert = false;
-    const originSelectedStatements = selectedStatements.map(
-      (item) => item.sourceNode
-    );
-    for (let statement of (parentBlockOfSelectedNodes!.sourceNode as any)
-      .statements) {
+    const originSelectedStatements = selectedStatements.map((item) => item.sourceNode);
+    for (let statement of (parentBlockOfSelectedNodes!.sourceNode as any).statements) {
       if (!originSelectedStatements.includes(statement)) {
         newStatements.push(statement);
       } else if (!insert) {
         insert = true;
-        let caller: ts.AwaitExpression | ts.CallExpression =
-          factory.createCallExpression(
-            factory.createIdentifier(newFunctionName),
-            undefined,
-            argumentList
-          );
+        let caller: ts.AwaitExpression | ts.CallExpression = factory.createCallExpression(
+          factory.createIdentifier(newFunctionName),
+          undefined,
+          argumentList
+        );
         if (awaitFlag) {
           caller = factory.createAwaitExpression(caller);
         }
@@ -55,9 +51,7 @@ export const statementsToCurrentModule = async () => {
           const identifierName = getIdentifierName(identifier);
           if (!identifiersShouldReturnSet.has(identifierName)) {
             identifiersShouldReturnSet.add(identifierName);
-            identifiersShouldReturn.push(
-              identifier.sourceNode as ts.Identifier
-            );
+            identifiersShouldReturn.push(identifier.sourceNode as ts.Identifier);
           }
         }
         for (let identifierName of identifiersReassigned) {
@@ -74,12 +68,7 @@ export const statementsToCurrentModule = async () => {
                       ? identifiersShouldReturn[0]
                       : factory.createObjectBindingPattern(
                           identifiersShouldReturn.map((item) =>
-                            factory.createBindingElement(
-                              undefined,
-                              undefined,
-                              item,
-                              undefined
-                            )
+                            factory.createBindingElement(undefined, undefined, item, undefined)
                           )
                         ),
                     undefined,
@@ -92,9 +81,7 @@ export const statementsToCurrentModule = async () => {
             );
           } else {
             for (let identifier of identifiersShouldReturn) {
-              if (
-                !identifiersReassigned.has(identifier.escapedText as string)
-              ) {
+              if (!identifiersReassigned.has(identifier.escapedText as string)) {
                 newStatements.push(
                   factory.createVariableStatement(
                     undefined,
@@ -114,10 +101,7 @@ export const statementsToCurrentModule = async () => {
                       ? identifiersShouldReturn[0]
                       : factory.createObjectLiteralExpression(
                           identifiersShouldReturn.map((item) =>
-                            factory.createShorthandPropertyAssignment(
-                              item,
-                              undefined
-                            )
+                            factory.createShorthandPropertyAssignment(item, undefined)
                           )
                         ),
                     factory.createToken(ts.SyntaxKind.EqualsToken),
@@ -142,38 +126,35 @@ export const statementsToCurrentModule = async () => {
 export const expressionToCurrentModule = async () => {
   const result = await extractCodeToFunction(true);
   if (result) {
-    const {
-      sourceFile,
-      newFunctionName,
-      argumentList,
-      awaitFlag,
-      fullFilename,
-      parent,
-      selectedStatements,
-    } = result;
-    let caller: ts.AwaitExpression | ts.CallExpression =
-      factory.createCallExpression(
-        factory.createIdentifier(newFunctionName),
-        undefined,
-        argumentList
-      );
+    const { sourceFile, newFunctionName, argumentList, awaitFlag, fullFilename, parent, selectedStatements } =
+      result;
+    let caller: ts.AwaitExpression | ts.CallExpression = factory.createCallExpression(
+      factory.createIdentifier(newFunctionName),
+      undefined,
+      argumentList
+    );
     if (awaitFlag) {
       caller = factory.createAwaitExpression(caller);
     }
     if ((parent.sourceNode as any).body) {
-      (parent.sourceNode as any).body =
-        ts.factory.createParenthesizedExpression(caller);
+      (parent.sourceNode as any).body = ts.factory.createParenthesizedExpression(caller);
     } else if ((parent.sourceNode as any).expression) {
-      (parent.sourceNode as any).expression =
-        ts.factory.createParenthesizedExpression(caller);
+      (parent.sourceNode as any).expression = ts.factory.createParenthesizedExpression(caller);
     } else if (parent.kind === ts.SyntaxKind.BinaryExpression) {
       const [statement] = selectedStatements;
       if ((parent as any).sourceNode.left === statement.sourceNode) {
-        (parent.sourceNode as any).left =
-          ts.factory.createParenthesizedExpression(caller);
+        (parent.sourceNode as any).left = ts.factory.createParenthesizedExpression(caller);
       } else if ((parent as any).sourceNode.right === statement.sourceNode) {
-        (parent.sourceNode as any).right =
-          ts.factory.createParenthesizedExpression(caller);
+        (parent.sourceNode as any).right = ts.factory.createParenthesizedExpression(caller);
+      }
+    } else if (parent.kind === ts.SyntaxKind.PropertyAssignment) {
+      const name = doctor.getSonByProperty(parent, "name");
+      const initializer = doctor.getSonByProperty(parent, "initializer");
+      const [statement] = selectedStatements;
+      if (name?.id === statement.id) {
+        parent.sourceNodeAny.name = ts.factory.createParenthesizedExpression(caller);
+      } else if (initializer?.id === statement.id) {
+        parent.sourceNodeAny.initializer = ts.factory.createParenthesizedExpression(caller);
       }
     } else {
       throw new Error("Unhandled parent kind.");
@@ -184,14 +165,9 @@ export const expressionToCurrentModule = async () => {
 };
 
 export const constantToCurrentModule = async () => {
-  const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } =
-    getSelectedCodeInfo();
-  const {
-    selectedStatements,
-    identifierReferedByOuterScope,
-    identifiersReferenceFromOuterScope,
-    parent,
-  } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
+  const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename } = getSelectedCodeInfo();
+  const { selectedStatements, identifierReferedByOuterScope, identifiersReferenceFromOuterScope, parent } =
+    doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   assert.ok(selectedStatements.length === 1);
   assert.ok(!identifierReferedByOuterScope.length);
   assert.ok(!identifiersReferenceFromOuterScope.length);
@@ -222,30 +198,19 @@ export const constantToCurrentModule = async () => {
     )
   );
   const parentSourceNode = parent.sourceNode as any;
-  if (
-    parentSourceNode.arguments?.find(
-      (arg: any) => arg === selectedStatements[0].sourceNode
-    )
-  ) {
+  if (parentSourceNode.arguments?.find((arg: any) => arg === selectedStatements[0].sourceNode)) {
     parentSourceNode.arguments.splice(
-      parentSourceNode.arguments?.findIndex(
-        (arg: any) => arg === selectedStatements[0].sourceNode
-      ),
+      parentSourceNode.arguments?.findIndex((arg: any) => arg === selectedStatements[0].sourceNode),
       1,
       ts.factory.createIdentifier(newVariableName)
     );
-  } else if (
-    parentSourceNode.initializer === selectedStatements[0].sourceNode
-  ) {
+  } else if (parentSourceNode.initializer === selectedStatements[0].sourceNode) {
     parentSourceNode.initializer = ts.factory.createIdentifier(newVariableName);
   } else if (parentSourceNode.expression) {
     parentSourceNode.expression = ts.factory.createIdentifier(newVariableName);
   } else if (parentSourceNode.right) {
     parentSourceNode.right = ts.factory.createIdentifier(newVariableName);
   }
-  (sourceFile as any).statements = [
-    ...(sourceFile as any).statements,
-    newVariableStatement,
-  ];
+  (sourceFile as any).statements = [...(sourceFile as any).statements, newVariableStatement];
   await doctor.writeAstToFile(sourceFile!, fullFilename);
 };
