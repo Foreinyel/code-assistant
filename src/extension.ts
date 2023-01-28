@@ -42,6 +42,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.extract.constant.toCurrentModule",
     runCommand(extract.constantToCurrentModule)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.expression.toCurrentBlock",
+    runCommand(extract.expressionToCurrentBlock)
+  );
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.reorderGlobalStatements",
