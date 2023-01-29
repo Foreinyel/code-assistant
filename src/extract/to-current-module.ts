@@ -147,7 +147,7 @@ export const expressionToCurrentModule = async () => {
       } else if ((parent as any).sourceNode.right === statement.sourceNode) {
         (parent.sourceNode as any).right = ts.factory.createParenthesizedExpression(caller);
       }
-    } else if (parent.kind === ts.SyntaxKind.PropertyAssignment) {
+    } else if ([ts.SyntaxKind.PropertyAssignment, ts.SyntaxKind.VariableDeclaration].includes(parent.kind)) {
       const name = doctor.getSonByProperty(parent, "name");
       const initializer = doctor.getSonByProperty(parent, "initializer");
       const [statement] = selectedStatements;

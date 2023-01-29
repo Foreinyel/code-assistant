@@ -15,19 +15,7 @@ const getParentOfSelectedNodes = (selectedNodes: any, nodeIdsInSelectedNodes: an
   }
   return { parentOfSelectedNodes, outestNode };
 };
-const getPropertyNameBetweenFatherAndSon = (father: any, son: any) => {
-  let propertyName: string | null = null;
-  for (let k of Object.keys(father.sourceNodeAny)) {
-    if (
-      father.sourceNodeAny[k] === son?.sourceNodeAny ||
-      father.sourceNodeAny[k]?.includes?.(son?.sourceNodeAny)
-    ) {
-      propertyName = k;
-      break;
-    }
-  }
-  return propertyName;
-};
+
 export const expressionToCurrentBlock = async () => {
   const { nodeIdsInSelectedNodes, sourceFile, fullFilename, selectedNodes } = getSelectedCodeInfo();
   assert.ok(selectedNodes.length > 0);
@@ -49,7 +37,7 @@ export const expressionToCurrentBlock = async () => {
     nodeIdsInSelectedNodes
   );
   assert.ok(parentOfSelectedNodes);
-  const propertyName = getPropertyNameBetweenFatherAndSon(parentOfSelectedNodes, outestNode);
+  const propertyName = doctor.getPropertyNameBetweenFatherAndSon(parentOfSelectedNodes, outestNode!);
   assert.ok(propertyName);
   const currentBlock = myStatement?.father;
   assert.ok(currentBlock);
@@ -75,7 +63,7 @@ export const expressionToCurrentBlock = async () => {
     }
     newChildren.push(son.sourceNode);
   }
-  const propertyNameOfBlock = getPropertyNameBetweenFatherAndSon(currentBlock.father, currentBlock);
+  const propertyNameOfBlock = doctor.getPropertyNameBetweenFatherAndSon(currentBlock.father!, currentBlock);
   assert.ok(propertyNameOfBlock);
   parentOfSelectedNodes.sourceNodeAny[propertyName] = ts.factory.createIdentifier(newVariableName);
   currentBlock.father!.sourceNodeAny[propertyNameOfBlock] = ts.factory.createBlock(newChildren as any, true);
