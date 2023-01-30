@@ -35,6 +35,10 @@ export function activate(context: vscode.ExtensionContext) {
     runCommand(extract.toComponent)
   );
   vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.element-with-specified-attributes.toComponent",
+    runCommand(extract.elementWithSpecifiedAttributesToComponent)
+  );
+  vscode.commands.registerCommand(
     "jvs-code-assistant.extract.expression.toCurrentModule",
     runCommand(extract.expressionToCurrentModule)
   );

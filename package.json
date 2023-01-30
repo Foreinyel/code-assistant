@@ -15,6 +15,7 @@
     "onCommand:jvs-code-assistant.extract.statement.toTargetModule",
     "onCommand:jvs-code-assistant.extract.statement.toNewModule",
     "onCommand:jvs-code-assistant.extract.elements.toComponent",
+    "onCommand:jvs-code-assistant.extract.element-with-specified-attributes.toComponent",
     "onCommand:jvs-code-assistant.extract.expression.toCurrentModule",
     "onCommand:jvs-code-assistant.extract.constant.toCurrentModule",
     "onCommand:jvs-code-assistant.extract.expression.toCurrentBlock",
@@ -42,6 +43,10 @@
       {
         "command": "jvs-code-assistant.extract.elements.toComponent",
         "title": "jvs - Extract Elements To Component"
+      },
+      {
+        "command": "jvs-code-assistant.extract.element-with-specified-attributes.toComponent",
+        "title": "jvs - Extract Element-With-Specified-Attributes To Component"
       },
       {
         "command": "jvs-code-assistant.extract.expression.toCurrentModule",
