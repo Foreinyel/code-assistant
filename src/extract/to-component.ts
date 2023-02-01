@@ -213,11 +213,8 @@ const checkIfOpeningElementTagName = (node: doctor.Node) => {
   );
 };
 export const elementWithSpecifiedAttributesToComponent = async () => {
-  const { nodeList, nodeIdsInSelectedNodes, sourceFile, fullFilename, selectedNodes } = getSelectedCodeInfo();
-  const { selectedStatements, identifiersReferenceFromOuterScope } = doctor.findReferredInfoOfNodeIds(
-    nodeIdsInSelectedNodes,
-    nodeList
-  );
+  const { nodeIdsInSelectedNodes, sourceFile, fullFilename, selectedNodes } = getSelectedCodeInfo();
+
   assert.equal(nodeIdsInSelectedNodes.size, 1, "please select an element.");
   const [element] = selectedNodes;
   assert.equal(element.kind, ts.SyntaxKind.Identifier, "please select an element.");
