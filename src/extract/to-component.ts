@@ -240,7 +240,7 @@ export const elementWithSpecifiedAttributesToComponent = async () => {
       component: newComponent,
       interfaceOfProps,
       componentName,
-    } = doctor.generateFunctionComponent(newComponentName, false, [], element.father?.sourceNodeAny, {
+    } = doctor.generateFunctionComponent(newComponentName, false, [], [element.father?.sourceNodeAny], {
       isSourceNode: true,
     }));
     const parent = element.father?.father!;

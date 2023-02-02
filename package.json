@@ -1,7 +1,7 @@
 {
   "name": "jvs-code-assistant",
   "displayName": "Jvs Code Assistant",
-  "description": "help you to write clean code, do code refactoring",
+  "description": "clean code, code refactoring",
   "version": "0.6.0",
   "engines": {
     "vscode": "^1.69.0"
@@ -25,7 +25,7 @@
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
-  "main": "./bundle/main.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
