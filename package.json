@@ -6,7 +6,7 @@
   "engines": {
     "vscode": "^1.69.0"
   },
-  "icon": "https://raw.githubusercontent.com/Foreinyel/code-assistant/main/res/logo.png",
+  "icon": "res/logo.png",
   "categories": [
     "Other"
   ],
@@ -25,7 +25,7 @@
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
     "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
   ],
-  "main": "./out/extension.js",
+  "main": "./bundle/main.js",
   "contributes": {
     "commands": [
       {
