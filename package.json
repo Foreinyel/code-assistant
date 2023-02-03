@@ -2,7 +2,7 @@
   "name": "jvs-code-assistant",
   "displayName": "Jvs Code Assistant",
   "description": "clean code, code refactoring",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "engines": {
     "vscode": "^1.69.0"
   },
