@@ -1,26 +1,18 @@
 import React from "react";
-import { Button } from "antd";
 export default class ClassComponent extends React.Component<any, any> {
   state = {
-    wwwww: 1,
+    ppppp: 1,
   };
   constructor(props) {
     super(props);
-    this.state.wwwww = 3;
+    this.state.ppppp = 3;
   }
   setAAA = () => {
-    this.setState({ wwwww: 3 });
+    this.setState({ ppppp: 3 });
   };
   render() {
-    const { state: sssssss } = this;
-    const { wwwww: ccdsd } = this.state;
-    console.log(`🚀 ~ file: ClassComponent.tsx:15 ~ ClassComponent ~ render ~ aaa`, ccdsd, sssssss.wwwww);
-    return (
-      <div>
-        <div>{this.state.wwwww}</div>
-        <div>{this.props.name}</div>
-        <Button onClick={this.setAAA}>点击</Button>
-      </div>
-    );
+    const { ppppp: ccdsd } = this.state;
+    console.log(ccdsd);
+    return <div>{this.state.ppppp}</div>;
   }
 }
