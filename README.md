@@ -50,6 +50,8 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 
 #### rename identifier in module
 
+![renameIdentifierInModule](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/renameIdentifierInModule.gif)
+
 ### Generate
 
 #### generate new function component in folder
