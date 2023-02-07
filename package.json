@@ -1,14 +1,22 @@
 {
   "name": "jvs-code-assistant",
   "displayName": "Jvs Code Assistant",
-  "description": "clean code, code refactoring",
+  "description": "clean code, TypeScript(React) refactoring, Code Automation",
   "version": "0.6.3",
   "engines": {
     "vscode": "^1.69.0"
   },
   "icon": "res/logo.png",
   "categories": [
+    "Snippets",
     "Other"
+  ],
+  "keywords": [
+    "refactor",
+    "refactoring",
+    "react",
+    "typescript",
+    "automation"
   ],
   "activationEvents": [
     "onCommand:jvs-code-assistant.extract.statements.toCurrentModule",
