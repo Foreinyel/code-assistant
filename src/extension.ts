@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import * as extract from "./extract";
 import * as clean from "./clean";
 import * as generate from "./generate";
+import * as mark from "./mark";
 import { runCommand } from "./common";
 
 // this method is called when your extension is activated
@@ -50,6 +51,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.extract.expression.toCurrentBlock",
     runCommand(extract.expressionToCurrentBlock)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.extract.elements.toCurrentBlock",
+    runCommand(extract.elementsToCurrentBlock)
+  )
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.reorderGlobalStatements",
@@ -72,7 +77,23 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.generate.newFunctionComponentInModule",
     runCommand(generate.newFunctionComponentInModule)
   );
+
+  try {
+    vscode.workspace.onDidChangeTextDocument((ev) => processActiveFile(ev.document));
+    vscode.window.onDidChangeActiveTextEditor((ev) => processActiveFile(ev?.document));
+    processActiveFile(vscode.window.activeTextEditor?.document);
+  } catch {}
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
+
+const processActiveFile = async (document: vscode.TextDocument | undefined) => {
+  try {
+    if (document) {
+      await mark.markDeadCode(document);
+    }
+  } catch (err) {
+    vscode.window.showErrorMessage((err as any).message);
+  }
+};

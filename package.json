@@ -19,21 +19,10 @@
     "automation"
   ],
   "activationEvents": [
-    "onCommand:jvs-code-assistant.extract.statements.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.statement.toTargetModule",
-    "onCommand:jvs-code-assistant.extract.statement.toNewModule",
-    "onCommand:jvs-code-assistant.extract.elements.toComponent",
-    "onCommand:jvs-code-assistant.extract.element-with-specified-attributes.toComponent",
-    "onCommand:jvs-code-assistant.extract.expression.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.constant.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.expression.toCurrentBlock",
-    "onCommand:jvs-code-assistant.clean.reorderGlobalStatements",
-    "onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule",
-    "onCommand:jvs-code-assistant.clean.renameIdentifierInModule",
-    "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
-    "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
   ],
-  "main": "./bundle/main.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -67,6 +56,10 @@
       {
         "command": "jvs-code-assistant.extract.expression.toCurrentBlock",
         "title": "jvs - Extract expression To Current Block"
+      },
+      {
+        "command": "jvs-code-assistant.extract.elements.toCurrentBlock",
+        "title": "jvs - Extract elements To Current Block"
       },
       {
         "command": "jvs-code-assistant.clean.reorderGlobalStatements",
