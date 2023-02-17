@@ -36,6 +36,10 @@
 
 ![extract expression to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.expression.toCurrentBlock.gif)
 
+#### extract elements to current block
+
+![extract elements to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.elements.toCurrentBlock.gif)
+
 #### extract constant to current module
 
 ![extract constant to current module](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.constant.toCurrentModule.gif)

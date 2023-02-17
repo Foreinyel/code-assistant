@@ -34,6 +34,10 @@
 
 ![extract expression to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.expression.toCurrentBlock.gif)
 
+#### 提取元素到当前块
+
+![extract elements to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.elements.toCurrentBlock.gif)
+
 #### 提取常量到当前模块
 
 ![extract constant to current module](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.constant.toCurrentModule.gif)
