@@ -2,24 +2,6 @@ import * as doctor from "@fe-doctor/core";
 import { strict as assert } from "assert";
 import ts from "typescript";
 import { getDocumentInfo } from "./getDocumentInfo";
-const checkIfNodeEndToLastLine = (
-  lineStart: any,
-  lineEnd: any,
-  node: any,
-  characterEnd: any,
-  characterStart: any
-) => {
-  return (
-    lineStart !== lineEnd &&
-    node?.line?.end === lineEnd &&
-    node.character.end <= characterEnd &&
-    (node?.line?.start === lineStart
-      ? node?.character.start >= characterStart
-      : node?.line?.start < lineStart
-      ? false
-      : true)
-  );
-};
 const checkIfNodeInOneLine = (
   lineStart: any,
   lineEnd: any,
@@ -56,6 +38,24 @@ const checkIfNodeStartFromFirstLine = (
       : true)
   );
 };
+const checkIfNodeEndToLastLine = (
+  lineStart: any,
+  lineEnd: any,
+  node: any,
+  characterEnd: any,
+  characterStart: any
+) => {
+  return (
+    lineStart !== lineEnd &&
+    node?.line?.end === lineEnd &&
+    node.character.end <= characterEnd &&
+    (node?.line?.start === lineStart
+      ? node?.character.start >= characterStart
+      : node?.line?.start < lineStart
+      ? false
+      : true)
+  );
+};
 const checkIfNodeSelected = (
   node: any,
   lineStart: any,
@@ -76,6 +76,9 @@ const checkIfParentAndChildrenSameRange = (node: any) => {
     node.sons[0].kind === ts.SyntaxKind.Identifier &&
     [ts.SyntaxKind.BindingElement, ts.SyntaxKind.ShorthandPropertyAssignment].includes(node.kind)
   );
+};
+const checkIfJsxElementWithoutAttributes = (node: any) => {
+  return node.kind === ts.SyntaxKind.JsxAttributes && node.sons.length === 0;
 };
 export const getSelectedCodeInfo = () => {
   const { editor, document, nodeList, sourceFile, fullFilename, rootPath, projectName, programFile } =
@@ -108,6 +111,9 @@ export const getSelectedCodeInfo = () => {
   }
   const selectedNodesValid = selectedNodes.filter((node) => {
     if (checkIfParentAndChildrenSameRange(node)) {
+      return false;
+    }
+    if (checkIfJsxElementWithoutAttributes(node)) {
       return false;
     }
     return true;

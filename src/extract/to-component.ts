@@ -213,9 +213,9 @@ const checkIfOpeningElementTagName = (node: doctor.Node) => {
   );
 };
 export const elementWithSpecifiedAttributesToComponent = async () => {
-  const { nodeIdsInSelectedNodes, sourceFile, fullFilename, selectedNodes } = getSelectedCodeInfo();
+  const { selectedNodesValid, sourceFile, fullFilename, selectedNodes } = getSelectedCodeInfo();
 
-  assert.equal(nodeIdsInSelectedNodes.size, 1, "please select an element.");
+  assert.equal(selectedNodesValid.length, 1, "please select an element.");
   const [element] = selectedNodes;
   assert.equal(element.kind, ts.SyntaxKind.Identifier, "please select an element.");
   const isSelfClosingElement = checkIfSelfClosingElementTagName(element);
