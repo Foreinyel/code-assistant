@@ -67,7 +67,3 @@
 #### generate new function component in module
 
 ![generate new function component in module](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/generate.newFunctionComponent.inModule.gif)
-
-## Contact
-
-<hemynshihao@gmail.com>
