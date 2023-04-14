@@ -1,29 +1,26 @@
 {
   "name": "jvs-code-assistant",
   "displayName": "Jvs Code Assistant",
-  "description": "clean code, code refactoring",
-  "version": "0.6.3",
+  "description": "clean code, TypeScript(React) refactoring, Code Automation",
+  "version": "0.7.2",
   "engines": {
     "vscode": "^1.69.0"
   },
   "icon": "res/logo.png",
   "categories": [
+    "Snippets",
     "Other"
   ],
+  "keywords": [
+    "refactor",
+    "refactoring",
+    "react",
+    "typescript",
+    "automation"
+  ],
   "activationEvents": [
-    "onCommand:jvs-code-assistant.extract.statements.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.statement.toTargetModule",
-    "onCommand:jvs-code-assistant.extract.statement.toNewModule",
-    "onCommand:jvs-code-assistant.extract.elements.toComponent",
-    "onCommand:jvs-code-assistant.extract.element-with-specified-attributes.toComponent",
-    "onCommand:jvs-code-assistant.extract.expression.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.constant.toCurrentModule",
-    "onCommand:jvs-code-assistant.extract.expression.toCurrentBlock",
-    "onCommand:jvs-code-assistant.clean.reorderGlobalStatements",
-    "onCommand:jvs-code-assistant.clean.removeUnusedCodeInModule",
-    "onCommand:jvs-code-assistant.clean.renameIdentifierInModule",
-    "onCommand:jvs-code-assistant.generate.newFunctionComponentInFolder",
-    "onCommand:jvs-code-assistant.generate.newFunctionComponentInModule"
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
   ],
   "main": "./bundle/main.js",
   "contributes": {
@@ -59,6 +56,10 @@
       {
         "command": "jvs-code-assistant.extract.expression.toCurrentBlock",
         "title": "jvs - Extract expression To Current Block"
+      },
+      {
+        "command": "jvs-code-assistant.extract.elements.toCurrentBlock",
+        "title": "jvs - Extract elements To Current Block"
       },
       {
         "command": "jvs-code-assistant.clean.reorderGlobalStatements",

@@ -1,8 +1,10 @@
 # code-assistant
 
-Code Assistant helps you to code faster, and refactoring old-time codes.
+`JVS` is a tool of Code Automation. It can help you to write clean code, do code refactoring. Overall, it helps you write better code.
 
-## features
+[中文](./README_zh.md)
+
+## Features
 
 ### Extract
 
@@ -33,6 +35,10 @@ Code Assistant helps you to code faster, and refactoring old-time codes.
 #### extract expression to current block
 
 ![extract expression to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.expression.toCurrentBlock.gif)
+
+#### extract elements to current block
+
+![extract elements to current block](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/extract.elements.toCurrentBlock.gif)
 
 #### extract constant to current module
 
