@@ -1,5 +1,5 @@
 function A(a) {
-  if (a) {
+  if (true) {
     return 3;
 
     const v = 4;

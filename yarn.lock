@@ -48,13 +48,14 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fe-doctor/core@0.2.18":
-  version "0.2.18"
-  resolved "https://registry.yarnpkg.com/@fe-doctor/core/-/core-0.2.18.tgz#bd4201dcbb19a4412b39b51aaa478cd26c1aa9ff"
-  integrity sha512-v0jsQWsjt1F7eTMoA2nppFPUgh8hxwEK1FBfR2JmlB0Op/mRgYRzBLybbShxewlu9BdkdPEGcyvWcYX68fBgrw==
+"@fe-doctor/core@0.2.20":
+  version "0.2.20"
+  resolved "http://ires.58corp.com/repository/58npm/@fe-doctor/core/-/core-0.2.20.tgz#5f9feb27a673ffd93cbb419961d6107315b9d68e"
+  integrity sha512-k2BP2x5pqE0x5vDzd6Fb+NYeATVHHsR5JrnzOEIVpC9ZMLUKgsvEEW2uc3/N0g8EtfjNGenBky4vJ2PgzPDqLA==
   dependencies:
     cosmiconfig "^7.0.0"
     iconv-lite "^0.6.3"
+    immer "^9.0.19"
 
 "@hemyn/utils-node@^0.4.3":
   version "0.4.3"
@@ -1107,6 +1108,11 @@ ignore@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.0.tgz#6d3bac8fa7fe0d45d9f9be7bac2fc279577e345a"
   integrity sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==
+
+immer@^9.0.19:
+  version "9.0.21"
+  resolved "http://ires.58corp.com/repository/58npm/immer/-/immer-9.0.21.tgz#1e025ea31a40f24fb064f1fef23e931496330176"
+  integrity sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==
 
 import-fresh@^3.0.0, import-fresh@^3.2.1:
   version "3.3.0"
