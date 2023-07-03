@@ -54,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "jvs-code-assistant.extract.elements.toCurrentBlock",
     runCommand(extract.elementsToCurrentBlock)
-  )
+  );
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.reorderGlobalStatements",
@@ -91,7 +91,8 @@ export function deactivate() {}
 const processActiveFile = async (document: vscode.TextDocument | undefined) => {
   try {
     if (document) {
-      await mark.markDeadCode(document);
+      console.log(`🚀 ~ file: extension.ts:94 ~ processActiveFile ~ document:`, document.languageId);
+      // await mark.markDeadCode(document);
     }
   } catch (err) {
     vscode.window.showErrorMessage((err as any).message);
