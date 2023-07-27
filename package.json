@@ -22,7 +22,7 @@
     "onLanguage:typescript",
     "onLanguage:typescriptreact"
   ],
-  "main": "./out/extension.js",
+  "main": "./bundle/main.js",
   "contributes": {
     "commands": [
       {
