@@ -134,8 +134,7 @@
   },
   "dependencies": {
     "@fe-doctor/core": "^0.3.0",
-    "@hemyn/utils-node": "^0.4.3",
-    "typescript": "^4.7.4"
+    "@hemyn/utils-node": "^0.4.3"
   },
   "publisher": "Foreinyel",
   "repository": "https://github.com/Foreinyel/code-assistant"
