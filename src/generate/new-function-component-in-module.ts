@@ -29,8 +29,7 @@ export const newFunctionComponentInModule = async () => {
     return;
   }
 
-  const { interfaceOfProps, component, componentName } =
-    doctor.generateFunctionComponent(newComponentName);
+  const { interfaceOfProps, component, componentName } = doctor.generateFunctionComponent(newComponentName);
 
   const isSymbolDuplicated = nodeList.find(
     (item) =>
@@ -39,9 +38,7 @@ export const newFunctionComponentInModule = async () => {
   );
 
   if (isSymbolDuplicated) {
-    vscode.window.showErrorMessage(
-      `${componentName} duplicated in current module.`
-    );
+    vscode.window.showErrorMessage(`${componentName} duplicated in current module.`);
     return;
   }
 
@@ -51,8 +48,7 @@ export const newFunctionComponentInModule = async () => {
   if (
     nodeList.find(
       (item) =>
-        item.kind === ts.SyntaxKind.Identifier &&
-        (item.sourceNode as ts.Identifier)?.escapedText === "React"
+        item.kind === ts.SyntaxKind.Identifier && (item.sourceNode as ts.Identifier)?.escapedText === "React"
     )
   ) {
     isReactImported = true;
@@ -71,20 +67,11 @@ export const newFunctionComponentInModule = async () => {
     );
   }
 
-  (sourceFile as any).statements = [
-    ...(sourceFile as any).statements,
-    interfaceOfProps,
-    component,
-  ];
+  (sourceFile as any).statements = [...(sourceFile as any).statements, interfaceOfProps, component];
 
   newNodeList = doctor.reloadModuleNodeList(programFile);
 
-  const module = doctor.sortGlobalStatementsInModule(
-    new doctor.ModuleNodeList(programFile, newNodeList)
-  );
+  const module = doctor.reorderGlobalStatements(new doctor.ModuleNodeList(programFile, newNodeList));
 
-  await doctor.writeAstToFile(
-    module.programFile.ast!,
-    programFile.getAbsolutePath()
-  );
+  await doctor.writeAstToFile(module.programFile.ast!, programFile.getAbsolutePath());
 };

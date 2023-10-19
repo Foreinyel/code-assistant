@@ -48,14 +48,15 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fe-doctor/core@0.2.20":
-  version "0.2.20"
-  resolved "http://ires.58corp.com/repository/58npm/@fe-doctor/core/-/core-0.2.20.tgz#5f9feb27a673ffd93cbb419961d6107315b9d68e"
-  integrity sha512-k2BP2x5pqE0x5vDzd6Fb+NYeATVHHsR5JrnzOEIVpC9ZMLUKgsvEEW2uc3/N0g8EtfjNGenBky4vJ2PgzPDqLA==
+"@fe-doctor/core@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.npmjs.org/@fe-doctor/core/-/core-0.3.0.tgz#10477aa37a5654513a06a249ef1f6f5f3cf1d02f"
+  integrity sha512-mbIf38ioEm3pgkZytKoC6OYtkrZhirKhyZn9pi7tpTkMzkePxS6qeKACY9B2wFemQh+zhw2ISEzZ1nuqnNoC2Q==
   dependencies:
     cosmiconfig "^7.0.0"
     iconv-lite "^0.6.3"
     immer "^9.0.19"
+    typescript "4.7.4"
 
 "@hemyn/utils-node@^0.4.3":
   version "0.4.3"
@@ -1709,6 +1710,11 @@ type-fest@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
+
+typescript@4.7.4:
+  version "4.7.4"
+  resolved "https://registry.npmjs.org/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
+  integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
 
 typescript@^4.7.4:
   version "4.8.4"

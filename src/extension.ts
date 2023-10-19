@@ -77,6 +77,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.generate.newFunctionComponentInModule",
     runCommand(generate.newFunctionComponentInModule)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.generate.newEnumInModule",
+    runCommand(generate.newEnumInModule)
+  );
 
   try {
     vscode.workspace.onDidChangeTextDocument((ev) => processActiveFile(ev.document));
@@ -91,7 +95,6 @@ export function deactivate() {}
 const processActiveFile = async (document: vscode.TextDocument | undefined) => {
   try {
     if (document) {
-      console.log(`🚀 ~ file: extension.ts:94 ~ processActiveFile ~ document:`, document.languageId);
       // await mark.markDeadCode(document);
     }
   } catch (err) {
