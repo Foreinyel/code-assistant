@@ -23,12 +23,13 @@ export const newEnumInModule = async () => {
 
   const enumNodes = doctor.generateEnum(newEnumName);
 
-  const isSymbolDuplicated = nodeList.find(
-    (item) =>
-      item.kind === ts.SyntaxKind.Identifier && (item.sourceNode as ts.Identifier).escapedText === newEnumName
+  // const isSymbolDuplicated = nodeList.find((item) => doctor.checkIfSpecifiedIdentifier(newEnumName, item));
+  const isSymbolDefinedInModule = doctor.checkIfVariableNameDefinedInModule(
+    newEnumName,
+    new doctor.ModuleNodeList(programFile, nodeList)
   );
 
-  if (isSymbolDuplicated) {
+  if (isSymbolDefinedInModule) {
     vscode.window.showErrorMessage(`${newEnumName} duplicated in current module.`);
     return;
   }
