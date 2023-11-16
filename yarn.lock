@@ -49,10 +49,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@fe-doctor/core@0.3.2":
-  version "0.3.2"
-  resolved "https://registry.npmjs.org/@fe-doctor/core/-/core-0.3.2.tgz#339c182426ed8deab2f87f041740cb4b8216af37"
-  integrity sha512-HN6TrOPixkUwugL9AVhmeX+c0JObpKWdtD3bMsPRj6dvE4CNYZsLAD76w6T+0iC7kkgtRS+j6gEY5hKf8UIiAw==
+"@fe-doctor/core@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.npmjs.org/@fe-doctor/core/-/core-0.3.3.tgz#b5567e33376050f5b954aef9d69bc08c79c94732"
+  integrity sha512-DAl81doLJ3nP8GB6yfs+PWmXRY3iBE9eGA39JbXCo5d5CXOK8JEnT0Ik3edWuXa4bKJZgd+1IPQMXJsTYiYIwg==
   dependencies:
     cosmiconfig "^7.0.0"
     iconv-lite "^0.6.3"

@@ -133,7 +133,7 @@
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@fe-doctor/core": "0.3.2",
+    "@fe-doctor/core": "0.3.3",
     "@hemyn/utils-node": "^0.4.3"
   },
   "publisher": "Foreinyel",
