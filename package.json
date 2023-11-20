@@ -2,7 +2,7 @@
   "name": "jvs-code-assistant",
   "displayName": "Jvs Code Assistant",
   "description": "clean code, TypeScript(React) refactoring, Code Automation",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "engines": {
     "vscode": "^1.69.0"
   },
