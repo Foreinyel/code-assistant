@@ -54,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(
     "jvs-code-assistant.extract.elements.toCurrentBlock",
     runCommand(extract.elementsToCurrentBlock)
-  )
+  );
 
   vscode.commands.registerCommand(
     "jvs-code-assistant.clean.reorderGlobalStatements",
@@ -77,6 +77,10 @@ export function activate(context: vscode.ExtensionContext) {
     "jvs-code-assistant.generate.newFunctionComponentInModule",
     runCommand(generate.newFunctionComponentInModule)
   );
+  vscode.commands.registerCommand(
+    "jvs-code-assistant.generate.newEnumInModule",
+    runCommand(generate.newEnumInModule)
+  );
 
   try {
     vscode.workspace.onDidChangeTextDocument((ev) => processActiveFile(ev.document));
@@ -91,7 +95,7 @@ export function deactivate() {}
 const processActiveFile = async (document: vscode.TextDocument | undefined) => {
   try {
     if (document) {
-      await mark.markDeadCode(document);
+      // await mark.markDeadCode(document);
     }
   } catch (err) {
     vscode.window.showErrorMessage((err as any).message);

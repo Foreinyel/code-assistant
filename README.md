@@ -67,3 +67,16 @@
 #### generate new function component in module
 
 ![generate new function component in module](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/generate.newFunctionComponent.inModule.gif)
+
+#### generate new enum in module
+
+```
+export enum Abc {
+    Key = "value"
+}
+export const AbcDesc = {
+    [Abc.Key]: "label"
+};
+export const AbcList = Object.keys(AbcDesc).map(value => ({ value, label: AbcDesc[value] }));
+
+```

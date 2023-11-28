@@ -8,18 +8,11 @@ import { ModuleNodeList } from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
 const pickTargetModule = async (rootPath: any) => {
   const configuration = vscode.workspace.getConfiguration("jvs-code-assistant");
-  let filesInSrc = await hm.listFiles(
-    path.resolve(rootPath, configuration.src),
-    [
-      path.resolve(rootPath, "node_modules"),
-      ...(configuration.excludes as string[]).map((item) =>
-        path.resolve(rootPath, configuration.src, item)
-      ),
-    ]
-  );
-  filesInSrc = filesInSrc.filter(
-    (item) => item.endsWith("ts") || item.endsWith("tsx")
-  );
+  let filesInSrc = await hm.listFiles(path.resolve(rootPath, configuration.src), [
+    path.resolve(rootPath, "node_modules"),
+    ...(configuration.excludes as string[]).map((item) => path.resolve(rootPath, configuration.src, item)),
+  ]);
+  filesInSrc = filesInSrc.filter((item) => item.endsWith("ts") || item.endsWith("tsx"));
   const targetModule = await vscode.window.showQuickPick(
     filesInSrc.map((item) => path.relative(rootPath, item)),
     {
@@ -30,17 +23,8 @@ const pickTargetModule = async (rootPath: any) => {
   return targetModule;
 };
 const prepareBeforeExtract = () => {
-  const {
-    nodeList,
-    nodeIdsInSelectedNodes,
-    rootPath,
-    projectName,
-    fullFilename,
-  } = getSelectedCodeInfo();
-  const { selectedStatements } = doctor.findReferredInfoOfNodeIds(
-    nodeIdsInSelectedNodes,
-    nodeList
-  );
+  const { nodeList, nodeIdsInSelectedNodes, rootPath, projectName, fullFilename } = getSelectedCodeInfo();
+  const { selectedStatements } = doctor.findReferredInfoOfNodeIds(nodeIdsInSelectedNodes, nodeList);
   // 一次只能移动一个statement，并且这个statement在module的全局中定义
   assert.equal(selectedStatements.length, 1, "Only one statement at a time.");
   const [selectedStatement] = selectedStatements;
@@ -51,18 +35,14 @@ const prepareBeforeExtract = () => {
   );
   return { rootPath, projectName, selectedStatement, nodeList, fullFilename };
 };
-const checkIfSingleDeclarationInVariableStatement = (
-  selectedStatement: doctor.Node
-) => {
+const checkIfSingleDeclarationInVariableStatement = (selectedStatement: doctor.Node) => {
   return (
     selectedStatement.kind === ts.SyntaxKind.VariableStatement &&
-    (selectedStatement.sourceNode as ts.VariableStatement)?.declarationList
-      ?.declarations?.length === 1
+    (selectedStatement.sourceNode as ts.VariableStatement)?.declarationList?.declarations?.length === 1
   );
 };
 export const toNewModule = async () => {
-  const { fullFilename, selectedStatement, nodeList, projectName, rootPath } =
-    prepareBeforeExtract();
+  const { fullFilename, selectedStatement, nodeList, projectName, rootPath } = prepareBeforeExtract();
   let newModuleName: string | null = null;
   if (checkIfSingleDeclarationInVariableStatement(selectedStatement)) {
     const variableDeclarationList = selectedStatement.sons.filter(
@@ -84,8 +64,7 @@ export const toNewModule = async () => {
       ts.SyntaxKind.TypeAliasDeclaration,
     ].includes(selectedStatement.kind)
   ) {
-    newModuleName = (selectedStatement.sourceNode as any)?.name
-      ?.escapedText as string;
+    newModuleName = (selectedStatement.sourceNode as any)?.name?.escapedText as string;
   }
   if (!newModuleName) {
     newModuleName = (await vscode.window.showInputBox({
@@ -128,29 +107,20 @@ export const toNewModule = async () => {
     selectedStatement.programFile.ast!,
     selectedStatement.programFile.getAbsolutePath()
   );
-  await doctor.writeAstToFile(
-    newModuleProgramFile.ast!,
-    newModuleProgramFile.getAbsolutePath()
-  );
+  await doctor.writeAstToFile(newModuleProgramFile.ast!, newModuleProgramFile.getAbsolutePath());
 };
 /**
  * 提取方法到公用模块
  */
 export const toTargetModule = async () => {
-  const { rootPath, projectName, selectedStatement, nodeList } =
-    prepareBeforeExtract();
+  const { rootPath, projectName, selectedStatement, nodeList } = prepareBeforeExtract();
   const targetModule = await pickTargetModule(rootPath);
   if (!targetModule) {
     return;
   }
   const targetFullFilename = path.resolve(rootPath, targetModule);
   const targetFilename = path.basename(targetFullFilename);
-  const targetProgramFile = new doctor.ProgramFile(
-    projectName,
-    rootPath,
-    targetModule,
-    targetFilename
-  );
+  const targetProgramFile = new doctor.ProgramFile(projectName, rootPath, targetModule, targetFilename);
   const targetNodeList = doctor.loadNodeListByFile(targetProgramFile);
   doctor.moveGlobalStatementToTargetModule(
     selectedStatement.id,
@@ -161,8 +131,5 @@ export const toTargetModule = async () => {
     selectedStatement.programFile.ast!,
     selectedStatement.programFile.getAbsolutePath()
   );
-  await doctor.writeAstToFile(
-    targetProgramFile.ast!,
-    targetProgramFile.getAbsolutePath()
-  );
+  await doctor.writeAstToFile(targetProgramFile.ast!, targetProgramFile.getAbsolutePath());
 };

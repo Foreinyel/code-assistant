@@ -65,3 +65,16 @@
 #### 在当前模块生成新的组件
 
 ![generate new function component in module](https://raw.githubusercontent.com/Foreinyel/code-assistant/main/how-to-use/generate.newFunctionComponent.inModule.gif)
+
+#### 在当前模块定义枚举
+
+```
+export enum Abc {
+    Key = "value"
+}
+export const AbcDesc = {
+    [Abc.Key]: "label"
+};
+export const AbcList = Object.keys(AbcDesc).map(value => ({ value, label: AbcDesc[value] }));
+
+```
