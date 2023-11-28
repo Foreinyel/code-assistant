@@ -196,6 +196,12 @@ export const toComponent = async () => {
       }
     }
     (parentNodeOfSelectedNodes!.sourceNode as any).children = newChilren;
+  } else if (parentNodeOfSelectedNodes) {
+    const propertyName=doctor.getPropertyNameBetweenFatherAndSon(parentNodeOfSelectedNodes, selectedStatements[0]);
+    if (propertyName) {
+      parentNodeOfSelectedNodes.sourceNodeAny[propertyName] = componentElement
+    }
+
   }
   await doctor.writeAstToFile(sourceFile!, fullFilename);
 };

@@ -71,7 +71,6 @@ export const toNewModule = async () => {
     const variableDeclaration = variableDeclarationList[0].sons[0];
     const names = doctor.getVariableNamesOfVariableDeclaration(
       variableDeclaration,
-      nodeList
     );
     if (names.length === 1) {
       newModuleName = names[0];
