@@ -22,7 +22,7 @@
     "onLanguage:typescript",
     "onLanguage:typescriptreact"
   ],
-  "main": "./bundle/main.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -102,6 +102,11 @@
             "res"
           ],
           "description": "relative paths which are not source folders should be excluded."
+        },
+        "jvs-code-assistant.cssType": {
+          "type": "string",
+          "default": "less",
+          "description": "css file type of component: css, less, scss."
         }
       }
     }
@@ -133,7 +138,7 @@
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@fe-doctor/core": "0.3.4",
+    "@fe-doctor/core": "0.3.5",
     "@hemyn/utils-node": "^0.4.3"
   },
   "publisher": "Foreinyel",

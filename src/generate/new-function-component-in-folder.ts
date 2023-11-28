@@ -4,6 +4,7 @@ import path from "path";
 import * as doctor from "@fe-doctor/core";
 import ts from "typescript";
 import { getProjectInfo } from "../common/getProjectInfo";
+import fsp from 'fs/promises'
 /**
  * @description 在文件夹中创建组件
  */
@@ -71,15 +72,23 @@ export const newFunctionComponentInFolder = async () => {
   );
   programFile.ast = ast;
   let nodeList = doctor.reloadModuleNodeList(programFile);
+  const importDescripters: doctor.ImportDescripter[] = [
+    {
+      defaultAlias: "React",
+      moduleSpecifier: "react",
+    },
+  ];
+  if (configuration.cssType) {
+    importDescripters.push({
+      moduleSpecifier: `./${componentName}.${configuration.cssType}`,
+    });
+    await fsp.writeFile(path.resolve(programFile.getDir(), `./${componentName}.${configuration.cssType}`), '');
+  }
   nodeList = doctor.batchImportFrom(
-    [
-      {
-        defaultAlias: "React",
-        moduleSpecifier: "react",
-      },
-    ],
+    importDescripters,
     nodeList,
     programFile
   );
   await doctor.writeAstToFile(programFile.ast!, programFile.getAbsolutePath());
+  
 };

@@ -6,6 +6,7 @@ import path from "path";
 import assert from "assert";
 import { ModuleNodeList } from "@fe-doctor/core";
 import { getSelectedCodeInfo } from "../common/getSelectedCodeInfo";
+import fsp from 'fs/promises'
 const pickTargetModule = async (rootPath: any) => {
   const configuration = vscode.workspace.getConfiguration("jvs-code-assistant");
   let filesInSrc = await hm.listFiles(path.resolve(rootPath, configuration.src), [
@@ -42,7 +43,11 @@ const checkIfSingleDeclarationInVariableStatement = (selectedStatement: doctor.N
   );
 };
 export const toNewModule = async () => {
+  const configuration = vscode.workspace.getConfiguration("jvs-code-assistant");
   const { fullFilename, selectedStatement, nodeList, projectName, rootPath } = prepareBeforeExtract();
+
+  let isReactComponent = false
+
   let newModuleName: string | null = null;
   if (checkIfSingleDeclarationInVariableStatement(selectedStatement)) {
     const variableDeclarationList = selectedStatement.sons.filter(
@@ -54,6 +59,7 @@ export const toNewModule = async () => {
     );
     if (names.length === 1) {
       newModuleName = names[0];
+      isReactComponent = doctor.ReactHelper.isFunctionComponent(variableDeclaration)
     }
   } else if (
     [
@@ -65,6 +71,7 @@ export const toNewModule = async () => {
     ].includes(selectedStatement.kind)
   ) {
     newModuleName = (selectedStatement.sourceNode as any)?.name?.escapedText as string;
+    isReactComponent = doctor.ReactHelper.checkIfClassComponent(selectedStatement) || doctor.ReactHelper.isFunctionComponent(selectedStatement)
   }
   if (!newModuleName) {
     newModuleName = (await vscode.window.showInputBox({
@@ -98,6 +105,18 @@ export const toNewModule = async () => {
     ts.NodeFlags.None
   );
   const newModuleNodeList = doctor.reloadModuleNodeList(newModuleProgramFile);
+
+  if (isReactComponent && configuration.cssType) {
+    doctor.batchImportFrom([
+      {
+        moduleSpecifier: `./${newModuleName}.${configuration.cssType}`,
+      },
+    ], newModuleNodeList, newModuleProgramFile);
+    await fsp.writeFile(
+      path.resolve(newModuleProgramFile.getDir(), `./${newModuleName}.${configuration.cssType}`),''
+    );
+  }
+
   doctor.moveGlobalStatementToTargetModule(
     selectedStatement.id,
     new ModuleNodeList(selectedStatement.programFile, nodeList),
