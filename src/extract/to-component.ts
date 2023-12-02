@@ -197,11 +197,19 @@ export const toComponent = async () => {
     }
     (parentNodeOfSelectedNodes!.sourceNode as any).children = newChilren;
   } else if (parentNodeOfSelectedNodes) {
-    const propertyName=doctor.getPropertyNameBetweenFatherAndSon(parentNodeOfSelectedNodes, selectedStatements[0]);
+    const propertyName = doctor.getPropertyNameBetweenFatherAndSon(
+      parentNodeOfSelectedNodes,
+      selectedStatements[0]
+    );
     if (propertyName) {
-      parentNodeOfSelectedNodes.sourceNodeAny[propertyName] = componentElement
+      if (Array.isArray(parentNodeOfSelectedNodes.sourceNodeAny[propertyName])) {
+        const elements = parentNodeOfSelectedNodes.sourceNodeAny[propertyName] as any[];
+        const idx = elements.findIndex((item) => item === selectedStatements[0].sourceNodeAny);
+        elements.splice(idx, 1, componentElement);
+      } else {
+        parentNodeOfSelectedNodes.sourceNodeAny[propertyName] = componentElement;
+      }
     }
-
   }
   await doctor.writeAstToFile(sourceFile!, fullFilename);
 };
